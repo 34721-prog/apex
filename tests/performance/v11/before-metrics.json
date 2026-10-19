@@ -1,0 +1,79 @@
+{
+  "environment": "Node.js v22.22.3 + Three.js CPU Scene/Simulation Benchmark (no GPU binary in container)",
+  "totalTrackLoadMs": 818.83,
+  "meanTrackLoadMs": 58.49,
+  "trackLoadMs": [
+    {
+      "id": "aurora",
+      "ms": 103.05943999999998
+    },
+    {
+      "id": "veloce",
+      "ms": 75.42588500000002
+    },
+    {
+      "id": "serpente",
+      "ms": 78.60404499999999
+    },
+    {
+      "id": "neon",
+      "ms": 66.362933
+    },
+    {
+      "id": "titan",
+      "ms": 43.41446500000001
+    },
+    {
+      "id": "vento",
+      "ms": 67.961027
+    },
+    {
+      "id": "sahara",
+      "ms": 38.09822200000008
+    },
+    {
+      "id": "alpine",
+      "ms": 46.45098100000007
+    },
+    {
+      "id": "emerald",
+      "ms": 68.82268499999998
+    },
+    {
+      "id": "oldtown",
+      "ms": 38.52500299999997
+    },
+    {
+      "id": "sunset",
+      "ms": 60.309709
+    },
+    {
+      "id": "nordic",
+      "ms": 42.26116000000002
+    },
+    {
+      "id": "desert-night",
+      "ms": 45.09949500000005
+    },
+    {
+      "id": "discovery",
+      "ms": 44.35376400000007
+    }
+  ],
+  "frameCpuMs": {
+    "mean": 0.143,
+    "p95": 0.2286,
+    "p99": 0.822,
+    "max": 19.3185
+  },
+  "simRunsMs": [
+    442.27,
+    339.68,
+    221.07,
+    216.54
+  ],
+  "simWarmMeanMs": 259.09,
+  "heapUsedBeforeMB": 30.73,
+  "heapUsedAfterMB": 29.69,
+  "heapDeltaMB": -1.04
+}

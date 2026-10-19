@@ -1,0 +1,478 @@
+[
+  {
+    "id": "aurora",
+    "mode": "own",
+    "time": 76.99999999999692,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000248,
+    "services": 6
+  },
+  {
+    "id": "aurora",
+    "mode": "shared",
+    "time": 138.2166666666688,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000261,
+    "services": 6
+  },
+  {
+    "id": "aurora",
+    "mode": "rain",
+    "time": 76.94999999999692,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000128,
+    "services": 6
+  },
+  {
+    "id": "aurora",
+    "mode": "traffic",
+    "wait": true,
+    "time": 8.71666666666668,
+    "damage": 0
+  },
+  {
+    "id": "veloce",
+    "mode": "own",
+    "time": 78.16666666666352,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000492,
+    "services": 6
+  },
+  {
+    "id": "veloce",
+    "mode": "shared",
+    "time": 139.76666666667003,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.150000000000056,
+    "services": 6
+  },
+  {
+    "id": "veloce",
+    "mode": "rain",
+    "time": 78.01666666666353,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000346,
+    "services": 6
+  },
+  {
+    "id": "veloce",
+    "mode": "traffic",
+    "wait": true,
+    "time": 8.71666666666668,
+    "damage": 0
+  },
+  {
+    "id": "serpente",
+    "mode": "own",
+    "time": 76.79999999999693,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000077,
+    "services": 6
+  },
+  {
+    "id": "serpente",
+    "mode": "shared",
+    "time": 138.60000000000244,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000126,
+    "services": 6
+  },
+  {
+    "id": "serpente",
+    "mode": "rain",
+    "time": 76.73333333333026,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000044,
+    "services": 6
+  },
+  {
+    "id": "serpente",
+    "mode": "traffic",
+    "wait": true,
+    "time": 8.71666666666668,
+    "damage": 0
+  },
+  {
+    "id": "neon",
+    "mode": "own",
+    "time": 77.51666666666355,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.150000000000007,
+    "services": 6
+  },
+  {
+    "id": "neon",
+    "mode": "shared",
+    "time": 140.35000000000383,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000277,
+    "services": 6
+  },
+  {
+    "id": "neon",
+    "mode": "rain",
+    "time": 77.41666666666356,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000048,
+    "services": 6
+  },
+  {
+    "id": "neon",
+    "mode": "traffic",
+    "wait": true,
+    "time": 8.71666666666668,
+    "damage": 0
+  },
+  {
+    "id": "titan",
+    "mode": "own",
+    "time": 78.24999999999685,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000294,
+    "services": 6
+  },
+  {
+    "id": "titan",
+    "mode": "shared",
+    "time": 144.0333333333401,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000565,
+    "services": 6
+  },
+  {
+    "id": "titan",
+    "mode": "rain",
+    "time": 78.08333333333019,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000137,
+    "services": 6
+  },
+  {
+    "id": "titan",
+    "mode": "traffic",
+    "wait": true,
+    "time": 8.71666666666668,
+    "damage": 0
+  },
+  {
+    "id": "vento",
+    "mode": "own",
+    "time": 78.28333333333018,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.150000000000046,
+    "services": 6
+  },
+  {
+    "id": "vento",
+    "mode": "shared",
+    "time": 145.3666666666745,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000599,
+    "services": 6
+  },
+  {
+    "id": "vento",
+    "mode": "rain",
+    "time": 78.14999999999685,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000423,
+    "services": 6
+  },
+  {
+    "id": "vento",
+    "mode": "traffic",
+    "wait": true,
+    "time": 8.71666666666668,
+    "damage": 0
+  },
+  {
+    "id": "sahara",
+    "mode": "own",
+    "time": 79.19999999999679,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000505,
+    "services": 6
+  },
+  {
+    "id": "sahara",
+    "mode": "shared",
+    "time": 138.883333333336,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000732,
+    "services": 6
+  },
+  {
+    "id": "sahara",
+    "mode": "rain",
+    "time": 79.0499999999968,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000492,
+    "services": 6
+  },
+  {
+    "id": "sahara",
+    "mode": "traffic",
+    "wait": true,
+    "time": 8.71666666666668,
+    "damage": 0
+  },
+  {
+    "id": "alpine",
+    "mode": "own",
+    "time": 79.26666666666345,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.15000000000004,
+    "services": 6
+  },
+  {
+    "id": "alpine",
+    "mode": "shared",
+    "time": 139.9666666666702,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.150000000000045,
+    "services": 6
+  },
+  {
+    "id": "alpine",
+    "mode": "rain",
+    "time": 79.11666666666346,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000432,
+    "services": 6
+  },
+  {
+    "id": "alpine",
+    "mode": "traffic",
+    "wait": true,
+    "time": 8.71666666666668,
+    "damage": 0
+  },
+  {
+    "id": "emerald",
+    "mode": "own",
+    "time": 79.26666666666345,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000474,
+    "services": 6
+  },
+  {
+    "id": "emerald",
+    "mode": "shared",
+    "time": 140.01666666667023,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000543,
+    "services": 6
+  },
+  {
+    "id": "emerald",
+    "mode": "rain",
+    "time": 79.13333333333013,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.150000000000037,
+    "services": 6
+  },
+  {
+    "id": "emerald",
+    "mode": "traffic",
+    "wait": true,
+    "time": 8.71666666666668,
+    "damage": 0
+  },
+  {
+    "id": "oldtown",
+    "mode": "own",
+    "time": 79.29999999999679,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000445,
+    "services": 6
+  },
+  {
+    "id": "oldtown",
+    "mode": "shared",
+    "time": 140.18333333333703,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.150000000000061,
+    "services": 6
+  },
+  {
+    "id": "oldtown",
+    "mode": "rain",
+    "time": 79.13333333333013,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000348,
+    "services": 6
+  },
+  {
+    "id": "oldtown",
+    "mode": "traffic",
+    "wait": true,
+    "time": 8.71666666666668,
+    "damage": 0
+  },
+  {
+    "id": "sunset",
+    "mode": "own",
+    "time": 79.28333333333012,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000512,
+    "services": 6
+  },
+  {
+    "id": "sunset",
+    "mode": "shared",
+    "time": 139.41666666666976,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000572,
+    "services": 6
+  },
+  {
+    "id": "sunset",
+    "mode": "rain",
+    "time": 79.13333333333013,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000559,
+    "services": 6
+  },
+  {
+    "id": "sunset",
+    "mode": "traffic",
+    "wait": true,
+    "time": 8.71666666666668,
+    "damage": 0
+  },
+  {
+    "id": "nordic",
+    "mode": "own",
+    "time": 79.31666666666345,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000536,
+    "services": 6
+  },
+  {
+    "id": "nordic",
+    "mode": "shared",
+    "time": 147.45000000000948,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.150000000000057,
+    "services": 6
+  },
+  {
+    "id": "nordic",
+    "mode": "rain",
+    "time": 79.16666666666346,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.150000000000031,
+    "services": 6
+  },
+  {
+    "id": "nordic",
+    "mode": "traffic",
+    "wait": true,
+    "time": 8.71666666666668,
+    "damage": 0
+  },
+  {
+    "id": "desert-night",
+    "mode": "own",
+    "time": 79.23333333333012,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000512,
+    "services": 6
+  },
+  {
+    "id": "desert-night",
+    "mode": "shared",
+    "time": 138.68333333333584,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000599,
+    "services": 6
+  },
+  {
+    "id": "desert-night",
+    "mode": "rain",
+    "time": 79.11666666666346,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000388,
+    "services": 6
+  },
+  {
+    "id": "desert-night",
+    "mode": "traffic",
+    "wait": true,
+    "time": 8.71666666666668,
+    "damage": 0
+  },
+  {
+    "id": "discovery",
+    "mode": "own",
+    "time": 79.29999999999679,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000534,
+    "services": 6
+  },
+  {
+    "id": "discovery",
+    "mode": "shared",
+    "time": 140.06666666667027,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000548,
+    "services": 6
+  },
+  {
+    "id": "discovery",
+    "mode": "rain",
+    "time": 79.13333333333013,
+    "overlaps": 0,
+    "invasions": 0,
+    "maxMove": 1.1500000000000503,
+    "services": 6
+  },
+  {
+    "id": "discovery",
+    "mode": "traffic",
+    "wait": true,
+    "time": 8.71666666666668,
+    "damage": 0
+  }
+]

@@ -1,0 +1,198 @@
+[
+  {
+    "track": "aurora",
+    "states": [
+      "parked",
+      "deploy",
+      "train",
+      "inlap",
+      "return"
+    ],
+    "maxMove": 0.36703065647628447,
+    "collisions": 0,
+    "time": 227.66666666673999,
+    "decisions": 0
+  },
+  {
+    "track": "veloce",
+    "states": [
+      "parked",
+      "deploy",
+      "train",
+      "inlap",
+      "return"
+    ],
+    "maxMove": 0.3669489721428731,
+    "collisions": 0,
+    "time": 287.700000000067,
+    "decisions": 0
+  },
+  {
+    "track": "serpente",
+    "states": [
+      "parked",
+      "deploy",
+      "train",
+      "inlap",
+      "return"
+    ],
+    "maxMove": 0.36728581035059765,
+    "collisions": 0,
+    "time": 257.0166666667616,
+    "decisions": 0
+  },
+  {
+    "track": "neon",
+    "states": [
+      "parked",
+      "deploy",
+      "train",
+      "inlap",
+      "return"
+    ],
+    "maxMove": 0.3669661305369312,
+    "collisions": 0,
+    "time": 262.9166666667562,
+    "decisions": 0
+  },
+  {
+    "track": "titan",
+    "states": [
+      "parked",
+      "deploy",
+      "train",
+      "inlap",
+      "return"
+    ],
+    "maxMove": 0.3671122100478134,
+    "collisions": 0,
+    "time": 336.9500000000222,
+    "decisions": 0
+  },
+  {
+    "track": "vento",
+    "states": [
+      "parked",
+      "deploy",
+      "train",
+      "inlap",
+      "return"
+    ],
+    "maxMove": 0.3669556671678261,
+    "collisions": 0,
+    "time": 275.7333333334112,
+    "decisions": 0
+  },
+  {
+    "track": "sahara",
+    "states": [
+      "parked",
+      "deploy",
+      "train",
+      "inlap",
+      "return"
+    ],
+    "maxMove": 0.3667384831794762,
+    "collisions": 0,
+    "time": 389.44999999997447,
+    "decisions": 0
+  },
+  {
+    "track": "alpine",
+    "states": [
+      "parked",
+      "deploy",
+      "train",
+      "inlap",
+      "return"
+    ],
+    "maxMove": 0.36713787708700857,
+    "collisions": 0,
+    "time": 369.5999999999925,
+    "decisions": 0
+  },
+  {
+    "track": "emerald",
+    "states": [
+      "parked",
+      "deploy",
+      "train",
+      "inlap",
+      "return"
+    ],
+    "maxMove": 0.3672175968604901,
+    "collisions": 0,
+    "time": 373.3833333333224,
+    "decisions": 0
+  },
+  {
+    "track": "oldtown",
+    "states": [
+      "parked",
+      "deploy",
+      "train",
+      "inlap",
+      "return"
+    ],
+    "maxMove": 0.36719784924504373,
+    "collisions": 0,
+    "time": 358.48333333333596,
+    "decisions": 0
+  },
+  {
+    "track": "sunset",
+    "states": [
+      "parked",
+      "deploy",
+      "train",
+      "inlap",
+      "return"
+    ],
+    "maxMove": 0.3668341545080932,
+    "collisions": 0,
+    "time": 378.86666666665076,
+    "decisions": 0
+  },
+  {
+    "track": "nordic",
+    "states": [
+      "parked",
+      "deploy",
+      "train",
+      "inlap",
+      "return"
+    ],
+    "maxMove": 0.3673641391244419,
+    "collisions": 0,
+    "time": 351.0166666666761,
+    "decisions": 0
+  },
+  {
+    "track": "desert-night",
+    "states": [
+      "parked",
+      "deploy",
+      "train",
+      "inlap",
+      "return"
+    ],
+    "maxMove": 0.3673027737601719,
+    "collisions": 0,
+    "time": 398.83333333329927,
+    "decisions": 0
+  },
+  {
+    "track": "discovery",
+    "states": [
+      "parked",
+      "deploy",
+      "train",
+      "inlap",
+      "return"
+    ],
+    "maxMove": 0.3667647231032531,
+    "collisions": 0,
+    "time": 353.50000000000716,
+    "decisions": 0
+  }
+]

@@ -1,0 +1,134 @@
+[
+  {
+    "id": "world",
+    "sessions": 18,
+    "races": 6,
+    "points": [
+      113,
+      105,
+      104,
+      85,
+      66,
+      61
+    ],
+    "finishers": [
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
+    ],
+    "decisions": 1
+  },
+  {
+    "id": "sprint",
+    "sessions": 6,
+    "races": 3,
+    "points": [
+      24,
+      19,
+      16,
+      15,
+      13,
+      12
+    ],
+    "finishers": [
+      6,
+      6,
+      6
+    ],
+    "decisions": 0
+  },
+  {
+    "id": "junior",
+    "sessions": 9,
+    "races": 3,
+    "points": [
+      40,
+      36,
+      33,
+      20,
+      18,
+      18
+    ],
+    "finishers": [
+      6,
+      6,
+      6
+    ],
+    "decisions": 0
+  },
+  {
+    "id": "endurance",
+    "sessions": 6,
+    "races": 3,
+    "points": [
+      74,
+      68,
+      63,
+      52,
+      40,
+      36
+    ],
+    "finishers": [
+      6,
+      6,
+      6
+    ],
+    "decisions": 2
+  },
+  {
+    "id": "one-make",
+    "sessions": 8,
+    "races": 4,
+    "points": [
+      73,
+      61,
+      51,
+      39,
+      38,
+      30
+    ],
+    "finishers": [
+      6,
+      6,
+      6,
+      6
+    ],
+    "decisions": 0
+  },
+  {
+    "id": "legends",
+    "sessions": 6,
+    "races": 3,
+    "points": [
+      52,
+      38,
+      33,
+      18,
+      7,
+      5
+    ],
+    "finishers": [
+      6,
+      6,
+      6
+    ],
+    "decisions": 0
+  },
+  {
+    "id": "time-attack",
+    "sessions": 3,
+    "races": 3,
+    "points": [
+      23
+    ],
+    "finishers": [
+      1,
+      1,
+      1
+    ],
+    "decisions": 0
+  }
+]
