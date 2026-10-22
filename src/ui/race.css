@@ -1305,214 +1305,522 @@
   min-width: 0;
 }
 
-/* F1 Multifunction Steering Wheel Cockpit HUD */
-.f1-wheel-cockpit {
-  position: fixed;
-  left: 50%;
-  bottom: 54px;
-  transform: translateX(-50%);
-  z-index: 18;
-  display: none;
-  pointer-events: none;
-}
-.f1-wheel-cockpit.show {
-  display: block;
-}
-.f1-wheel-body {
-  width: 390px;
-  background: linear-gradient(180deg, #171d26 0%, #0d1117 100%);
-  border: 2px solid #334155;
-  border-top: 3px solid #e63956;
-  border-radius: 26px 26px 18px 18px;
-  padding: 8px 12px 10px;
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  transition: transform 0.06s linear;
-  pointer-events: auto;
-}
-.f1-wheel-leds {
-  display: flex;
-  gap: 3px;
-  margin-bottom: 6px;
-  padding: 0 14px;
-}
-.f1-wheel-leds i {
-  flex: 1;
-  height: 5px;
-  background: #1e293b;
-  border-radius: 2px;
-}
-.f1-wheel-leds i.on {
-  background: #22c55e;
-  box-shadow: 0 0 6px #22c55e;
-}
-.f1-wheel-leds i:nth-child(n + 7).on {
-  background: #f59e0b;
-  box-shadow: 0 0 6px #f59e0b;
-}
-.f1-wheel-leds i:nth-child(n + 12).on {
-  background: #ef4444;
-  box-shadow: 0 0 6px #ef4444;
-}
-.f1-wheel-leds i:nth-child(n + 15).on {
-  background: #38bdf8;
-  box-shadow: 0 0 8px #38bdf8;
-}
-.f1-wheel-row {
-  display: grid;
-  grid-template-columns: 56px 1fr 56px;
-  gap: 8px;
-  align-items: stretch;
-}
-.f1-wheel-grip {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  justify-content: space-between;
-  background: #11161f;
-  border: 1px solid #263142;
-  border-radius: 14px;
-  padding: 6px 4px;
-}
-.wheel-btn {
-  font: 700 9px "Barlow Condensed", sans-serif;
-  letter-spacing: 0.6px;
-  padding: 4px 2px;
-  border-radius: 4px;
-  border: 1px solid #475569;
-  background: #1e293b;
-  color: #f8fafc;
-  cursor: pointer;
-}
-.wheel-btn.drs { border-color: #22c55e; color: #86efac; }
-.wheel-btn.radio { border-color: #38bdf8; color: #bae6fd; }
-.wheel-btn.pit { border-color: #f59e0b; color: #fde68a; }
-.wheel-btn.mode { border-color: #e63956; color: #fecdd3; }
-.wheel-vbar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 3px;
-}
-.wheel-vbar small {
-  font: 700 7px Barlow, sans-serif;
-  color: #94a3b8;
-}
-.wheel-vbar i {
-  width: 10px;
-  height: 36px;
-  background: #090d14;
-  border: 1px solid #334155;
+/* HUD DRS Status Badge */
+.hud-drs-badge {
+  font: 700 8px "Barlow Condensed", sans-serif;
+  letter-spacing: 0.8px;
+  padding: 2px 5px;
   border-radius: 3px;
-  display: flex;
-  align-items: flex-end;
-  overflow: hidden;
+  background: #1e293b;
+  color: #94a3b8;
+  border: 1px solid #334155;
 }
-.wheel-vbar em {
+.hud-drs-badge[data-active="1"] {
+  background: #14532d;
+  color: #86efac;
+  border-color: #22c55e;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.45);
+}
+
+/* 2D Motorsport Manager Driver Sheets, 10 Attributes & Youth Academy UI */
+.driver-sheet-hero {
+  display: grid;
+  grid-template-columns: 278px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  padding: 20px;
+}
+.driver-sheet-portrait-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.driver-portrait-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 8 / 9;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #2b3a4e;
+  background: linear-gradient(180deg, #101928 0%, #090e17 100%);
+  box-shadow: 0 12px 28px rgba(2, 6, 23, 0.55);
+}
+.driver-portrait-frame > img:first-of-type {
   width: 100%;
   height: 100%;
-  background: #ef4444;
-  transform-origin: bottom;
-  transform: scaleY(0);
+  object-fit: cover;
+  object-position: center top;
+  display: block;
 }
-.wheel-vbar.throttle em {
-  background: #22c55e;
+.driver-number-pill {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font: 800 18px "Barlow Condensed", sans-serif;
+  color: #ffffff;
+  padding: 2px 9px;
+  border-radius: 5px;
+  letter-spacing: 0.6px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+  z-index: 2;
 }
-.f1-wheel-screen {
-  background: #070b10;
-  border: 1px solid #334155;
+.driver-flag-pill {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font: 700 12px "Barlow Condensed", sans-serif;
+  color: #f1f5f9;
+  background: rgba(11, 17, 27, 0.86);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  padding: 3px 8px;
+  border-radius: 5px;
+  z-index: 2;
+}
+.driver-sheet-helmet {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 56px !important;
+  height: 56px !important;
+  object-fit: contain !important;
   border-radius: 8px;
-  padding: 6px 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  background: rgba(11, 17, 27, 0.88);
+  border: 1px solid #334155;
+  padding: 3px;
+  z-index: 2;
 }
-.wheel-screen-top {
+.portrait-placeholder-tag,
+.portrait-custom-tag {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  max-width: calc(100% - 78px);
+  font: 700 9px "Barlow Condensed", sans-serif;
+  letter-spacing: 0.6px;
+  padding: 3px 7px;
+  border-radius: 4px;
+  z-index: 2;
+}
+.portrait-placeholder-tag {
+  background: rgba(180, 83, 9, 0.92);
+  color: #fef3c7;
+  border: 1px solid #f59e0b;
+}
+.portrait-custom-tag {
+  background: rgba(14, 116, 144, 0.92);
+  color: #e0f2fe;
+  border: 1px solid #38bdf8;
+}
+.driver-portrait-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.driver-portrait-actions .btn {
+  padding: 9px 8px;
+  font-size: 10px;
+  justify-content: center;
+}
+.driver-sheet-header-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  font: 700 10px "Barlow Condensed", sans-serif;
+  align-items: flex-start;
+  gap: 14px;
+}
+.driver-sheet-header-row h2 {
+  margin: 4px 0 6px;
+  font-size: 32px;
+}
+.driver-sheet-header-row h2 small {
+  font-size: 18px;
+  color: #38bdf8;
+  margin-left: 6px;
+}
+.driver-meta-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  font-size: 12px;
   color: #cbd5e1;
-  border-bottom: 1px solid #1e293b;
-  padding-bottom: 3px;
+  margin-bottom: 8px;
 }
-.wheel-badge {
-  background: #166534;
-  color: #dcfce7;
-  padding: 1px 5px;
-  border-radius: 3px;
-  font-size: 9px;
+.driver-meta-pills b {
+  color: #94a3b8;
+  font-weight: 600;
 }
-.wheel-screen-main {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 6px;
-  padding: 2px 0;
+.team-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 5px;
+  vertical-align: middle;
 }
-.wheel-speed-col strong {
-  font: italic 800 30px "Barlow Condensed", sans-serif;
-  color: #f8fafc;
-  line-height: 1;
-  display: block;
-}
-.wheel-speed-col small,
-.wheel-gear-box small,
-.wheel-rpm-col small,
-.wheel-screen-cells small {
-  font: 700 7px Barlow, sans-serif;
-  color: #64748b;
-  display: block;
-}
-.wheel-gear-box {
+.driver-ovr-badge {
+  background: linear-gradient(180deg, #131f31 0%, #0b121e 100%);
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 8px 14px;
   text-align: center;
-  background: #111827;
-  border: 1px solid #374151;
-  border-radius: 5px;
-  padding: 2px 10px;
+  min-width: 96px;
 }
-.wheel-gear-box b {
-  font: 800 28px "Barlow Condensed", sans-serif;
-  color: #fbbf24;
-  line-height: 1;
-}
-.wheel-rpm-col {
-  text-align: right;
-}
-.wheel-rpm-col b {
-  font: 700 15px "Barlow Condensed", sans-serif;
-  color: #e2e8f0;
+.driver-ovr-badge small {
   display: block;
+  font: 700 8px "Barlow Condensed", sans-serif;
+  color: #94a3b8;
+  letter-spacing: 0.8px;
 }
-.wheel-rpm-col span {
-  font: 600 9px Barlow, sans-serif;
+.driver-ovr-badge strong {
+  display: block;
+  font: 800 32px "Barlow Condensed", sans-serif;
+  line-height: 1.05;
+  color: #f8fafc;
+}
+.driver-ovr-badge span {
+  font: 700 10px "Barlow Condensed", sans-serif;
   color: #38bdf8;
 }
-.wheel-screen-cells {
+.driver-bio-text {
+  margin: 6px 0 10px;
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.driver-card.driver-sheet-card {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  gap: 10px;
+}
+.driver-card-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 8 / 9;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #0b111b;
+  border: 1px solid #263448;
+}
+.driver-card-media > img:first-of-type {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+.driver-card-num {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  font: 800 13px "Barlow Condensed", sans-serif;
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 4px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.45);
+}
+.driver-card-helmet {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 38px !important;
+  height: 38px !important;
+  object-fit: contain !important;
+  background: rgba(11, 17, 27, 0.86);
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 2px;
+}
+.driver-card-team {
+  display: block;
+  color: #94a3b8;
+  font-size: 10px;
+  margin-bottom: 2px;
+}
+.driver-card-style {
+  font-size: 11px;
+  color: #cbd5e1;
+  margin: 2px 0 6px;
+}
+.driver-card-mini-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 4px;
-  border-top: 1px solid #1e293b;
-  padding-top: 4px;
-  text-align: center;
+  background: #0c131f;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
+  padding: 6px;
+  margin-bottom: 8px;
 }
-.wheel-screen-cells b {
-  font: 700 10px "Barlow Condensed", sans-serif;
-  color: #f1f5f9;
+.driver-card-mini-stats span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font: 700 8px "Barlow Condensed", sans-serif;
+  color: #64748b;
 }
-.wheel-screen-radio {
-  background: #0f172a;
-  color: #93c5fd;
-  font: 600 8px Barlow, sans-serif;
-  text-align: center;
-  padding: 2px 4px;
-  border-radius: 3px;
+.driver-card-mini-stats b {
+  font: 700 12px "Barlow Condensed", sans-serif;
+  color: #e2e8f0;
+}
+.driver-card-actions {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+  align-items: stretch;
+}
+.driver-card-actions .btn-download-mini {
+  padding: 8px 9px;
+  font-size: 9px;
   white-space: nowrap;
+}
+.academy-portrait-wrap {
+  position: relative;
+  width: 96px;
+  height: 108px;
+  border-radius: 8px;
   overflow: hidden;
-  text-overflow: ellipsis;
+  border: 1px solid #2b384b;
+  background: #0b111b;
+}
+.academy-portrait-2d {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+.portrait-placeholder-badge {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  right: 4px;
+  text-align: center;
+  background: rgba(180, 83, 9, 0.92);
+  color: #fef3c7;
+  font: 700 8px "Barlow Condensed", sans-serif;
+  padding: 1px 3px;
+  border-radius: 3px;
+}
+.academy-creator-2d-frame {
+  position: relative;
+  width: 196px;
+  height: 220px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #2b384b;
+  background: #0b111b;
+}
+.academy-creator-2d-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+.driver-skill-banner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 10px 0 12px;
+}
+.driver-skill-banner > div {
+  background: #0d1522;
+  border: 1px solid #263448;
+  border-left: 3px solid #e63956;
+  border-radius: 6px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.driver-skill-banner small {
+  font: 700 9px "Barlow Condensed", sans-serif;
+  color: #38bdf8;
+  letter-spacing: 0.8px;
+}
+.driver-skill-banner b {
+  font: 700 13px "Barlow Condensed", sans-serif;
+  color: #f8fafc;
+}
+.driver-skill-banner span {
+  font-size: 11px;
+  color: #94a3b8;
+}
+.attr-bar {
+  display: block;
+  width: 100%;
+  height: 4px;
+  background: #090e17;
+  border-radius: 2px;
+  margin-top: 3px;
+  overflow: hidden;
+}
+.attr-bar em {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #38bdf8, #e63956);
+}
+.academy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+.academy-card {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.academy-card.promoted {
+  box-shadow: 0 0 0 1px #22c55e, 0 10px 26px rgba(16, 185, 129, 0.16);
+}
+.academy-card-head {
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+.academy-ovr-box {
+  text-align: right;
+  background: #0d1522;
+  border: 1px solid #29384d;
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+.academy-ovr-box small {
+  display: block;
+  font: 700 8px "Barlow Condensed", sans-serif;
+  color: #94a3b8;
+}
+.academy-ovr-box b {
+  font: 800 24px "Barlow Condensed", sans-serif;
+  color: #f8fafc;
+}
+.academy-ovr-box b span {
+  font-size: 14px;
+  color: #38bdf8;
+}
+.academy-compare {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  background: #0c131f;
+  border: 1px solid #1e293b;
+  border-radius: 5px;
+  padding: 6px 10px;
+  font-size: 11px;
+  color: #cbd5e1;
+}
+.academy-compare small {
+  color: #94a3b8;
+  font-weight: 700;
+}
+.academy-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+.academy-empty {
+  padding: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+.modal[aria-label="academy-creator"] {
+  max-width: 780px;
+  width: 92vw;
+}
+.academy-creator-layout {
+  display: grid;
+  grid-template-columns: 216px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  margin: 12px 0;
+}
+.academy-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.academy-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font: 700 10px "Barlow Condensed", sans-serif;
+  color: #94a3b8;
+  letter-spacing: 0.6px;
+}
+.academy-form input[type="text"],
+.academy-form input[type="number"],
+.academy-form select {
+  background: #0d1522;
+  color: #f8fafc;
+  border: 1px solid #2b384b;
+  border-radius: 6px;
+  padding: 7px 10px;
+  font: 600 13px "Inter", sans-serif;
+  width: 100%;
+  box-sizing: border-box;
+}
+.academy-form input[type="color"] {
+  background: #0d1522;
+  border: 1px solid #2b384b;
+  border-radius: 6px;
+  height: 34px;
+  width: 100%;
+  padding: 3px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.academy-creator-preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.academy-creator-summary {
+  text-align: center;
+  background: #0d1522;
+  border: 1px solid #263448;
+  border-radius: 6px;
+  padding: 6px 8px;
+  width: 100%;
+}
+.academy-creator-summary b {
+  display: block;
+  font: 700 12px "Barlow Condensed", sans-serif;
+  color: #38bdf8;
+}
+.academy-creator-summary small {
+  font-size: 10px;
+  color: #94a3b8;
 }
 @media (max-width: 900px) {
-  .f1-wheel-body {
-    width: 310px;
+  .driver-sheet-hero,
+  .academy-creator-layout {
+    grid-template-columns: 1fr;
+  }
+  .driver-portrait-frame {
+    max-width: 280px;
+    margin: 0 auto;
+  }
+  .driver-sheet-header-row {
+    flex-direction: column;
+  }
+  .driver-skill-banner,
+  .academy-form {
+    grid-template-columns: 1fr;
+  }
+  .academy-card-head {
+    grid-template-columns: 84px 1fr;
+  }
+  .academy-ovr-box {
+    grid-column: 1 / -1;
+    text-align: left;
   }
 }
 

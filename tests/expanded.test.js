@@ -1,7 +1,20 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { driverCatalog, pilotStats } from "../src/data/drivers.js";
+import {
+  driverCatalog,
+  pilotStats,
+  ATTRIBUTE_LABELS,
+  SHEET_ATTRIBUTE_LABELS,
+  PLACEHOLDER_DRIVER_PORTRAIT,
+  nationalityFlag,
+  resolveDriverPortrait,
+  EXCLUSIVE_SKILLS,
+  STYLE_KEYS,
+  createAcademyDriver,
+  developAcademyDriver,
+  activeDriverForSave,
+} from "../src/data/drivers.js";
 import { vehicles, performance as stats } from "../src/garage.js";
 import { defaults, validateSave } from "../src/save.js";
 import { Race } from "../src/race.js";
@@ -187,3 +200,111 @@ test("v1.1 systems: 7 AI profiles, 6 power units, 11 parts comparator, 10 sponso
     assert.equal(v.gridValid, true);
   }
 });
+
+test("driver system overhaul: 2D sheets, 10 attributes, custom portraits, youth academy creation, training, promotion & Safety Car fixes", () => {
+  assert.equal(trackCatalog.length, 17);
+  for (const id of ["imperiale", "sakura", "lumina"]) {
+    assert.ok(trackCatalog.some((t) => t.id === id), `Missing new track ${id}`);
+  }
+  // 3D driver UI model file must be completely removed
+  assert.equal(fs.existsSync("src/ui/DriverPreview3D.js"), false);
+  assert.ok(fs.existsSync("public" + PLACEHOLDER_DRIVER_PORTRAIT));
+  assert.ok(fs.existsSync("public/assets/drivers/placeholder-driver.png"));
+
+  assert.equal(ATTRIBUTE_LABELS.length, 10);
+  assert.equal(SHEET_ATTRIBUTE_LABELS.length, 10);
+  assert.equal(EXCLUSIVE_SKILLS.length, 8);
+  assert.equal(STYLE_KEYS.length, 6);
+  for (const d of driverCatalog) {
+    for (const [k] of SHEET_ATTRIBUTE_LABELS) {
+      assert.ok(
+        Number.isFinite(d.attributes[k]) &&
+          d.attributes[k] >= 40 &&
+          d.attributes[k] <= 100,
+        `Invalid ${k} on ${d.name}`,
+      );
+    }
+    assert.ok(d.exclusiveSkill?.id);
+    assert.ok(STYLE_KEYS.includes(d.styleKey));
+    const flag = nationalityFlag(d.nationality);
+    assert.ok(flag.flag.length >= 2 && flag.code.length === 3);
+    const pInfo = resolveDriverPortrait(d, null);
+    assert.equal(pInfo.src, d.portrait);
+    assert.equal(pInfo.isPlaceholder, false);
+  }
+
+  // Youth Academy ("CRIAR PILOTO DA BASE") lifecycle + custom portrait + custom attributes
+  const s = defaults();
+  const rookie = createAcademyDriver(
+    {
+      firstName: "Lucas",
+      lastName: "Valente",
+      nationality: "Brasil",
+      age: 18,
+      program: "formula_jr",
+      styleKey: "Calculista",
+      skillId: "natural_talent",
+      suitColor: "#e63956",
+      helmetColor: "#38bdf8",
+      visorColor: "#f59e0b",
+      number: 28,
+      teamName: "Apex Motorsport",
+      usePlaceholder: true,
+      customAttributes: {
+        speed: 74,
+        racecraft: 72,
+        overtaking: 70,
+        defense: 68,
+        tireControl: 71,
+        consistency: 73,
+      },
+    },
+    s.academy,
+  );
+  assert.equal(rookie.isAcademy, true);
+  assert.equal(rookie.isPlaceholderPortrait, true);
+  assert.equal(rookie.portrait, PLACEHOLDER_DRIVER_PORTRAIT);
+  assert.equal(rookie.attributes.qualifyingPace, 74);
+  assert.equal(rookie.attributes.racePace, 72);
+  assert.ok(rookie.overall >= 55 && rookie.overall <= 85);
+  assert.ok(rookie.attributes.potential >= 85);
+  s.academy.push(rookie);
+
+  const beforeSpeed = rookie.attributes.speed;
+  const trainRes = developAcademyDriver(rookie, "pace");
+  assert.ok(trainRes.gained > 0);
+  assert.ok(rookie.attributes.speed > beforeSpeed);
+  assert.ok(rookie.attributes.speed <= rookie.attributes.potential);
+
+  // Promote academy driver to titular seat & verify single-driver team assignment
+  s.promotedAcademyId = rookie.uid;
+  assert.equal(activeDriverForSave(s).name, "Lucas Valente");
+  configureTrack("imperiale");
+  const r = new Race({ mode: "manager", laps: 1 });
+  assignTeam(r, s);
+  assert.equal(r.cars[0].name, "Lucas Valente");
+  assert.equal(r.cars[0].number, 28);
+  assert.equal(r.cars.length, 6);
+  assert.ok(r.cars.every((c) => !c.teammate));
+
+  // Safety Car deploys in default club mode on severe impact or immobilized retired car
+  const clubRace = new Race({ realism: "club", laps: 3 });
+  clubRace.state = "racing";
+  clubRace.time = 12;
+  clubRace.cars[2].retired = "Pane elétrica";
+  clubRace.cars[2].pit.state = "track";
+  clubRace.cars[2].speed = 0;
+  clubRace.control.update(1 / 60);
+  assert.equal(clubRace.control.phase, "sc");
+  assert.equal(clubRace.flag, "yellow");
+
+  // Persistence round-trip through validateSave (including customPortraits)
+  s.customPortraits[rookie.uid] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
+  const validated = validateSave(JSON.parse(JSON.stringify(s)));
+  assert.equal(validated.academy.length, 1);
+  assert.equal(validated.promotedAcademyId, rookie.uid);
+  assert.equal(validated.academy[0].name, "Lucas Valente");
+  assert.equal(resolveDriverPortrait(validated.academy[0], validated).isCustom, true);
+  assert.deepEqual(validateSave(JSON.parse(JSON.stringify(validated))), validated);
+});
+

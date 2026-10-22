@@ -8,7 +8,7 @@ import { careerDefaults } from "./championships/Catalog.js";
 import { defaultStrategy, validateStrategy } from "./strategy/RaceStrategy.js";
 import { DEFAULT_KEYS } from "./controls.js";
 import { trackCatalog } from "./data/tracks.js";
-import { driverCatalog } from "./data/drivers.js";
+import { driverCatalog, validateAcademyDriver } from "./data/drivers.js";
 import { powerUnits } from "./data/powerUnits.js";
 import {
   partCategories,
@@ -26,6 +26,9 @@ export const defaults = () => ({
   xp: 0,
   selectedDriver: 0,
   unlockedDrivers: [0],
+  academy: [],
+  promotedAcademyId: null,
+  customPortraits: {},
   driverStats: {},
   rivalries: {},
   records: {},
@@ -285,6 +288,28 @@ export function validateSave(value) {
   s.selectedDriver = s.unlockedDrivers.includes(value.selectedDriver)
     ? value.selectedDriver
     : 0;
+  s.academy = (Array.isArray(value.academy) ? value.academy : [])
+    .slice(0, 8)
+    .map((d, i) => validateAcademyDriver(d, i))
+    .filter(Boolean);
+  s.promotedAcademyId =
+    typeof value.promotedAcademyId === "string" &&
+    s.academy.some((d) => d.uid === value.promotedAcademyId)
+      ? value.promotedAcademyId
+      : null;
+  if (value.customPortraits && typeof value.customPortraits === "object") {
+    for (const [k, v] of Object.entries(value.customPortraits).slice(0, 52)) {
+      if (
+        typeof k === "string" &&
+        k.length <= 36 &&
+        typeof v === "string" &&
+        (v.startsWith("data:image/") || v.startsWith("/assets/drivers/")) &&
+        v.length <= 450000
+      ) {
+        s.customPortraits[k] = v;
+      }
+    }
+  }
   for (const [key, values] of Object.entries({
     track: trackCatalog.map((t) => t.id),
     mode: [

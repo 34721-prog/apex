@@ -16,10 +16,10 @@
       483
     ],
     "memory": {
-      "geometries": 20,
-      "textures": 10
+      "geometries": 30,
+      "textures": 18
     },
-    "programs": 23
+    "programs": 27
   },
   {
     "id": "veloce",
@@ -38,10 +38,10 @@
       483
     ],
     "memory": {
-      "geometries": 22,
-      "textures": 11
+      "geometries": 24,
+      "textures": 14
     },
-    "programs": 23
+    "programs": 27
   },
   {
     "id": "serpente",
@@ -60,10 +60,10 @@
       532
     ],
     "memory": {
-      "geometries": 31,
-      "textures": 13
+      "geometries": 38,
+      "textures": 19
     },
-    "programs": 23
+    "programs": 27
   },
   {
     "id": "neon",
@@ -82,10 +82,10 @@
       270
     ],
     "memory": {
-      "geometries": 26,
-      "textures": 11
+      "geometries": 32,
+      "textures": 16
     },
-    "programs": 24
+    "programs": 28
   },
   {
     "id": "titan",
@@ -104,10 +104,10 @@
       532
     ],
     "memory": {
-      "geometries": 23,
-      "textures": 11
+      "geometries": 26,
+      "textures": 16
     },
-    "programs": 23
+    "programs": 27
   },
   {
     "id": "vento",
@@ -126,10 +126,10 @@
       483
     ],
     "memory": {
-      "geometries": 19,
-      "textures": 9
+      "geometries": 25,
+      "textures": 14
     },
-    "programs": 23
+    "programs": 27
   },
   {
     "id": "sahara",
@@ -148,10 +148,10 @@
       532
     ],
     "memory": {
-      "geometries": 22,
-      "textures": 12
+      "geometries": 26,
+      "textures": 17
     },
-    "programs": 23
+    "programs": 27
   },
   {
     "id": "alpine",
@@ -170,10 +170,10 @@
       483
     ],
     "memory": {
-      "geometries": 18,
-      "textures": 8
+      "geometries": 22,
+      "textures": 10
     },
-    "programs": 23
+    "programs": 27
   },
   {
     "id": "emerald",
@@ -192,10 +192,10 @@
       483
     ],
     "memory": {
-      "geometries": 23,
-      "textures": 11
+      "geometries": 28,
+      "textures": 17
     },
-    "programs": 23
+    "programs": 27
   },
   {
     "id": "oldtown",
@@ -214,10 +214,10 @@
       270
     ],
     "memory": {
-      "geometries": 25,
-      "textures": 12
+      "geometries": 29,
+      "textures": 17
     },
-    "programs": 23
+    "programs": 27
   },
   {
     "id": "sunset",
@@ -236,10 +236,10 @@
       483
     ],
     "memory": {
-      "geometries": 22,
-      "textures": 11
+      "geometries": 27,
+      "textures": 16
     },
-    "programs": 23
+    "programs": 27
   },
   {
     "id": "nordic",
@@ -258,10 +258,10 @@
       483
     ],
     "memory": {
-      "geometries": 21,
-      "textures": 11
+      "geometries": 28,
+      "textures": 17
     },
-    "programs": 23
+    "programs": 27
   },
   {
     "id": "desert-night",
@@ -280,10 +280,10 @@
       532
     ],
     "memory": {
-      "geometries": 23,
-      "textures": 11
+      "geometries": 28,
+      "textures": 16
     },
-    "programs": 24
+    "programs": 28
   },
   {
     "id": "discovery",
@@ -302,10 +302,10 @@
       483
     ],
     "memory": {
-      "geometries": 21,
-      "textures": 10
+      "geometries": 27,
+      "textures": 16
     },
-    "programs": 23
+    "programs": 27
   },
   {
     "id": "aurora",
@@ -324,9 +324,9 @@
       483
     ],
     "memory": {
-      "geometries": 20,
-      "textures": 10
+      "geometries": 30,
+      "textures": 18
     },
-    "programs": 23
+    "programs": 27
   }
 ]

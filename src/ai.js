@@ -241,6 +241,7 @@ export function botInput(car, cars, time, difficulty = "normal") {
       car.stewards &&
       car.stewards.random() <
         0.002 *
+          (p.skillId === "ice_veins" ? 0.35 : 1) *
           (1 - Math.min(1, p.pressure ?? 0.8)) *
           (1 - Math.min(1, p.experience ?? 0.8))
     ) {
@@ -277,7 +278,8 @@ export function botInput(car, cars, time, difficulty = "normal") {
         clamp((car.speed - (ahead?.speed ?? car.speed) + 5) / 16, 0, 1) * 0.4 +
         (1 - Math.min(1, curv / policy.maxPassCurvature)) * 0.3 +
         p.overtaking * 0.25 +
-        p.precision * 0.1;
+        (p.cornering ?? p.precision ?? 0.8) * 0.1 +
+        (p.skillId === "overtake_master" ? 0.045 : 0);
       if (
         ahead &&
         ahead.id !== car.managerPlan?.avoid &&
@@ -403,18 +405,29 @@ export function botInput(car, cars, time, difficulty = "normal") {
   const cornerSpeed = Math.sqrt(
     ((15 - 5 * (car.wetness ?? (car.weather === "rain" ? 1 : 0))) *
       (car.tireGrip ?? 1) *
-      (car.weather === "rain" ? 0.94 + 0.06 * (p.wetSkill ?? 0.8) : 1)) /
+      (car.weather === "rain"
+        ? 0.94 +
+          0.06 * (p.wetSkill ?? 0.8) +
+          (p.skillId === "rain_master" ? 0.025 : 0)
+        : 1)) /
       Math.max(curv, 0.002),
   );
   const profile = aiProfileFor(car);
-  let pace = policy.pace * (car.id === 0 ? 1 : profile.pace);
+  const skillPace =
+    (p.skillId === "qualifying_ace" && (car.tires?.health ?? 1) > 0.82
+      ? 1.005
+      : 1) *
+    (p.skillId === "rocket_starter" && car.lap === 0 && time < 15 ? 1.008 : 1);
+  let pace = policy.pace * (car.id === 0 ? 1 : profile.pace) * skillPace;
   if (strategy.pace === "recovery" && time - a.lastBattle < 7) pace = 1.022;
   let targetSpeed = Math.min(
     car.stats.maxSpeed,
     cornerSpeed *
       mode.pace *
       pace *
-      (0.94 + p.precision * 0.035 + (p.skill ?? 0.8) * 0.025) *
+      (0.94 +
+        (p.cornering ?? p.precision ?? 0.8) * 0.035 +
+        (p.speed ?? p.skill ?? 0.8) * 0.025) *
       (1 +
         Math.sin(time * 0.3 + car.id) *
           mode.consistency *

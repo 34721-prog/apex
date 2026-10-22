@@ -1,60 +1,66 @@
 [
   {
     "state": "entry",
-    "x": -512.2095752338365,
-    "z": 212.8233797392918,
+    "x": -512.1320298836396,
+    "z": 213.09048045463635,
     "result": {
       "errors": [],
       "visible": [
-        4,
+        2,
         5,
+        3,
         0
       ],
       "depthIds": [
         0,
+        2,
+        3,
         4,
         5
       ],
-      "draws": 24,
+      "draws": 45,
       "updates": 1,
       "span": [
-        224,
+        288,
         128
       ],
       "resources": {
-        "geometries": 51,
-        "textures": 13
+        "geometries": 76,
+        "textures": 18
       }
     }
   },
   {
     "state": "service",
     "phase": 0,
-    "x": -324.4427161134468,
-    "z": 308.0877498685757,
+    "x": -324.4429401515176,
+    "z": 308.0866591401291,
     "result": {
       "errors": [],
       "visible": [
+        1,
         0
       ],
       "depthIds": [
-        0
+        0,
+        1,
+        4
       ],
-      "draws": 8,
+      "draws": 27,
       "updates": 2,
       "span": [
-        224,
+        288,
         128
       ],
       "resources": {
-        "geometries": 73,
-        "textures": 16
+        "geometries": 108,
+        "textures": 21
       }
     }
   },
   {
     "state": "jacked",
-    "phase": 0.35293379404701036,
+    "phase": 0.35122811226381057,
     "y": 0.28,
     "result": {
       "errors": [],
@@ -62,75 +68,79 @@
         0
       ],
       "depthIds": [
-        0
+        0,
+        1,
+        4
       ],
-      "draws": 4,
+      "draws": 23,
       "updates": 4,
       "span": [
-        224,
+        288,
         128
       ],
       "resources": {
-        "geometries": 74,
-        "textures": 16
+        "geometries": 110,
+        "textures": 22
       }
     }
   },
   {
     "state": "release",
     "phase": 1,
-    "x": -324.4427161134468,
-    "z": 308.0877498685757,
+    "x": -324.4429401515176,
+    "z": 308.0866591401291,
     "result": {
       "errors": [],
       "visible": [
         0
       ],
       "depthIds": [
-        0
+        0,
+        1
       ],
-      "draws": 8,
+      "draws": 14,
       "updates": 5,
       "span": [
-        224,
+        288,
         128
       ],
       "resources": {
-        "geometries": 74,
-        "textures": 16
+        "geometries": 110,
+        "textures": 22
       }
     }
   },
   {
     "state": "exit",
     "phase": 1,
-    "x": -324.4427161134468,
-    "z": 308.0877498685757,
+    "x": -324.4429401515176,
+    "z": 308.0866591401291,
     "result": {
       "errors": [],
       "visible": [
         0
       ],
       "depthIds": [
-        0
+        0,
+        1
       ],
-      "draws": 8,
+      "draws": 14,
       "updates": 6,
       "span": [
-        224,
+        288,
         128
       ],
       "resources": {
-        "geometries": 74,
-        "textures": 16
+        "geometries": 110,
+        "textures": 22
       }
     }
   },
   {
     "state": "track",
     "phase": 1,
-    "x": -44.587805775355896,
-    "z": 341.85821729533427,
+    "x": -44.59723898670321,
+    "z": 341.8580272409259,
     "result": {
       "errors": [],
       "visible": [],
@@ -138,12 +148,12 @@
       "draws": 0,
       "updates": 7,
       "span": [
-        224,
+        288,
         128
       ],
       "resources": {
-        "geometries": 74,
-        "textures": 16
+        "geometries": 110,
+        "textures": 22
       }
     }
   }

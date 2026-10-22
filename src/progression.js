@@ -1,5 +1,6 @@
 import { rememberRivals } from "./ai/Rivalries.js";
 import { recordRound } from "./championship.js";
+import { developAcademyDriver } from "./data/drivers.js";
 import {
   sponsorById,
   evaluateSponsorGoal,
@@ -193,6 +194,18 @@ export function rewardRace(save, race) {
       messages.push(
         `Meta ${primary.short} cumprida · +${sponsorTotal} CR de patrocínio`,
       );
+    }
+    if (Array.isArray(save.academy) && save.academy.length) {
+      for (const doc of save.academy) {
+        const isTitular = save.promotedAcademyId === doc.uid;
+        const devRes = developAcademyDriver(doc, "race", {
+          position: player.position,
+          titular: isTitular,
+        });
+        if (isTitular && devRes.gained > 0) {
+          messages.push(devRes.message);
+        }
+      }
     }
   }
   return { credits, position: player.position, messages, results, sponsorReport };

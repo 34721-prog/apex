@@ -1,6 +1,13 @@
 import { setPlan } from "../strategy/PitStrategy.js";
 import { compounds } from "../strategy/Resources.js";
-import { driverCatalog } from "../data/drivers.js";
+import {
+  driverCatalog,
+  activeDriverForSave,
+  resolveDriverPortrait,
+  createAcademyDriver,
+  generateRandomAcademyPreset,
+  developAcademyDriver,
+} from "../data/drivers.js";
 import { vehicles, purchasePart } from "../garage.js";
 import { defaults } from "../save.js";
 import { requestPit } from "../strategy/PitStop.js";
@@ -8,7 +15,189 @@ import { nextCamera } from "../camera/CameraManager.js";
 import { powerUnits } from "../data/powerUnits.js";
 import { aeroSetupById } from "../data/parts.js";
 import { sponsorById, teamPrincipalById } from "../data/sponsors.js";
+function findDriverByKey(save, rawKey) {
+  if (rawKey !== undefined && rawKey !== null && rawKey !== "") {
+    const strKey = String(rawKey);
+    const acad = (save.academy || []).find((a) => a.uid === strKey);
+    if (acad) return acad;
+    const numId = Number(strKey);
+    if (Number.isInteger(numId) && driverCatalog[numId]) {
+      return driverCatalog[numId];
+    }
+  }
+  return activeDriverForSave(save);
+}
+
+function slugifyName(name) {
+  return String(name || "piloto")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+export async function downloadDriverPortrait(g, rawKey) {
+  const s = g.save;
+  const ui = g.ui;
+  const driver = findDriverByKey(s, rawKey);
+  if (!driver) {
+    ui.toast("Não foi possível localizar o piloto selecionado.");
+    return;
+  }
+  const pInfo = resolveDriverPortrait(driver, s);
+  const src = pInfo.src;
+  const slug = slugifyName(driver.name);
+  const numStr = String(driver.number || 0).padStart(2, "0");
+
+  // Render or fetch a clean high-resolution PNG so downloads work across all formats
+  try {
+    let downloadUrl = src;
+    let revokeAfter = false;
+    let ext = "png";
+    if (src.startsWith("data:image/")) {
+      const m = src.match(/^data:image\/([a-zA-Z0-9+]+);/);
+      if (m) ext = m[1] === "jpeg" ? "jpg" : m[1].replace("+xml", "");
+    } else {
+      // Convert SVG/PNG portrait to a crisp downloadable PNG via offscreen canvas or fetch blob
+      const resp = await fetch(src);
+      if (!resp.ok) throw new Error(" Portrait HTTP " + resp.status);
+      const blob = await resp.blob();
+      if (blob.type === "image/png" || blob.type === "image/jpeg" || blob.type === "image/webp") {
+        ext = blob.type === "image/jpeg" ? "jpg" : blob.type === "image/webp" ? "webp" : "png";
+        downloadUrl = URL.createObjectURL(blob);
+        revokeAfter = true;
+      } else {
+        // Render SVG onto high-res 384x432 PNG canvas so the user gets a ready-to-use PNG portrait
+        const svgUrl = URL.createObjectURL(blob);
+        const pngBlob = await new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            canvas.width = 384;
+            canvas.height = 432;
+            const ctx = canvas.getContext("2d");
+            ctx.fillStyle = "#0b111b";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            URL.revokeObjectURL(svgUrl);
+            canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("toBlob failed"))), "image/png");
+          };
+          img.onerror = (err) => {
+            URL.revokeObjectURL(svgUrl);
+            reject(err);
+          };
+          img.src = svgUrl;
+        });
+        downloadUrl = URL.createObjectURL(pngBlob);
+        revokeAfter = true;
+        ext = "png";
+      }
+    }
+
+    const fileName = pInfo.isPlaceholder
+      ? `imagem-substituta-sem-foto-${slug}.${ext}`
+      : `retrato-${slug}-${numStr}.${ext}`;
+
+    const a = document.createElement("a");
+    a.href = downloadUrl;
+    a.download = fileName;
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    if (revokeAfter) {
+      setTimeout(() => URL.revokeObjectURL(downloadUrl), 5000);
+    }
+
+    if (pInfo.isPlaceholder) {
+      ui.toast(
+        `Aviso: ${driver.name} usa imagem substituta genérica (não é foto oficial). Arquivo "${fileName}" baixado.`,
+      );
+    } else {
+      ui.toast(`Retrato de ${driver.name} baixado (${fileName}).`);
+    }
+  } catch (err) {
+    ui.toast("Não foi possível baixar a imagem do piloto no momento.");
+  }
+}
+
+export function handlePortraitFileUpload(g, file, targetKey, onDone) {
+  const ui = g.ui;
+  const s = g.save;
+  if (!file) return;
+  const validTypes = [
+    "image/png",
+    "image/jpeg",
+    "image/webp",
+    "image/svg+xml",
+  ];
+  if (!validTypes.includes(file.type)) {
+    ui.toast("Formato inválido. Selecione uma imagem PNG, JPG, WEBP ou SVG.");
+    return;
+  }
+  if (file.size > 2.5 * 1024 * 1024) {
+    ui.toast("Imagem muito grande (máximo 2,5 MB). Escolha um arquivo menor.");
+    return;
+  }
+  const reader = new FileReader();
+  reader.onerror = () => ui.toast("Erro ao ler o arquivo de imagem.");
+  reader.onload = () => {
+    const rawDataUrl = String(reader.result || "");
+    const img = new Image();
+    img.onerror = () =>
+      ui.toast("Arquivo de imagem corrompido ou não suportado.");
+    img.onload = () => {
+      // Normalize to crisp 384x432 cover portrait PNG
+      const canvas = document.createElement("canvas");
+      canvas.width = 384;
+      canvas.height = 432;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "#0b111b";
+      ctx.fillRect(0, 0, 384, 432);
+      const iw = img.naturalWidth || 384;
+      const ih = img.naturalHeight || 432;
+      const scale = Math.max(384 / iw, 432 / ih);
+      const dw = iw * scale;
+      const dh = ih * scale;
+      const dx = (384 - dw) * 0.5;
+      const dy = (432 - dh) * 0.35;
+      ctx.drawImage(img, dx, dy, dw, dh);
+      const normalizedDataUrl = canvas.toDataURL("image/png", 0.92);
+
+      if (typeof onDone === "function") {
+        onDone(normalizedDataUrl);
+        ui.toast("Foto personalizada carregada com sucesso!");
+        return;
+      }
+
+      const driver = findDriverByKey(s, targetKey);
+      const key = String(driver.uid || driver.id);
+      s.customPortraits = s.customPortraits || {};
+      s.customPortraits[key] = normalizedDataUrl;
+      if (driver.isAcademy) {
+        driver.customPortrait = normalizedDataUrl;
+        driver.portrait = normalizedDataUrl;
+        driver.usePlaceholder = false;
+        driver.isPlaceholderPortrait = false;
+      }
+      g.store();
+      ui.render();
+      ui.toast(`Retrato de ${driver.name} atualizado com sucesso!`);
+    };
+    img.src = rawDataUrl;
+  };
+  reader.readAsDataURL(file);
+}
+
 export function handleExtraAction(g, action, data) {
+  if (!g.handlePortraitFileUpload) {
+    g.handlePortraitFileUpload = (file, targetKey, cb) =>
+      handlePortraitFileUpload(g, file, targetKey, cb);
+  }
+  if (!g.downloadDriverPortrait) {
+    g.downloadDriverPortrait = (key) => downloadDriverPortrait(g, key);
+  }
   const s = g.save,
     ui = g.ui;
   const refresh = () => {
@@ -52,17 +241,6 @@ export function handleExtraAction(g, action, data) {
     case "hud-mode": {
       const modes = ["standard", "compact", "immersive"];
       g.setting("hudMode", modes[(modes.indexOf(s.settings.hudMode) + 1) % 3]);
-      return true;
-    }
-    case "toggle-wheel": {
-      const next = s.settings.showWheelCockpit === false;
-      s.settings.showWheelCockpit = next;
-      g.store();
-      const wheel = document.getElementById("f1-wheel-cockpit");
-      if (wheel) wheel.classList.toggle("show", next);
-      ui.toast(
-        next ? "Volante F1 ativado no HUD." : "Volante F1 recolhido.",
-      );
       return true;
     }
     case "preview-pu": {
@@ -150,6 +328,121 @@ export function handleExtraAction(g, action, data) {
       return true;
     }
 
+    case "download-driver-image": {
+      downloadDriverPortrait(g, data.driverKey);
+      return true;
+    }
+    case "change-driver-image": {
+      ui.pendingPortraitTargetKey = data.driverKey;
+      const input = document.getElementById("driver-portrait-upload-input");
+      if (input) {
+        input.click();
+      } else {
+        ui.toast("Abra a aba Pilotos para enviar um retrato personalizado.");
+      }
+      return true;
+    }
+    case "open-academy-creator": {
+      ui.academyDraft = generateRandomAcademyPreset(
+        Date.now() + (s.academy?.length || 0) * 31,
+      );
+      ui.showModal("academy-creator");
+      return true;
+    }
+    case "academy-randomize": {
+      ui.academyDraft = generateRandomAcademyPreset(
+        Math.floor(Math.random() * 100000) + Date.now(),
+      );
+      ui.showModal("academy-creator");
+      ui.toast("Novo perfil de talento da base gerado.");
+      return true;
+    }
+    case "academy-create": {
+      s.academy = s.academy || [];
+      if (s.academy.length >= 8) {
+        ui.toast("Limite de 8 pilotos na Academia da Base atingido.");
+        return true;
+      }
+      const portraitSel = document.getElementById("acad-portrait-select")?.value;
+      const usePlaceholder = portraitSel === "placeholder";
+      const portraitIndex = usePlaceholder ? 0 : Number(portraitSel) || 0;
+      const draft = {
+        ...(ui.academyDraft || {}),
+        firstName: document.getElementById("acad-first-name")?.value,
+        lastName: document.getElementById("acad-last-name")?.value,
+        nationality: document.getElementById("acad-nationality")?.value,
+        age: Number(document.getElementById("acad-age")?.value),
+        number: Number(document.getElementById("acad-number")?.value),
+        program: document.getElementById("acad-program")?.value,
+        styleKey: document.getElementById("acad-style")?.value,
+        skillId: document.getElementById("acad-skill")?.value,
+        suitColor: document.getElementById("acad-suit-color")?.value,
+        helmetColor: document.getElementById("acad-helmet-color")?.value,
+        teamName:
+          document.getElementById("acad-team")?.value ||
+          s.team?.name ||
+          "Academia Apex Motorsport",
+        portraitIndex,
+        usePlaceholder,
+        customAttributes: {
+          speed: Number(document.getElementById("acad-attr-speed")?.value),
+          racecraft: Number(document.getElementById("acad-attr-racecraft")?.value),
+          overtaking: Number(document.getElementById("acad-attr-overtaking")?.value),
+          defense: Number(document.getElementById("acad-attr-defense")?.value),
+          tireControl: Number(document.getElementById("acad-attr-tire")?.value),
+          consistency: Number(document.getElementById("acad-attr-consistency")?.value),
+        },
+      };
+      const created = createAcademyDriver(draft, s.academy);
+      if (created.customPortrait) {
+        s.customPortraits = s.customPortraits || {};
+        s.customPortraits[created.uid] = created.customPortrait;
+      }
+      s.academy.push(created);
+      ui.academyDraft = null;
+      ui.closeModal();
+      refresh();
+      ui.toast(
+        `${created.name} (OVR ${created.overall} / POT ${created.attributes.potential}) integrado à Equipe & Academia!`,
+      );
+      return true;
+    }
+    case "academy-train": {
+      const doc = (s.academy || []).find((a) => a.uid === data.uid);
+      if (!doc) return true;
+      const cost = 350;
+      if (s.credits < cost) {
+        ui.toast("Créditos insuficientes para sessão de treinamento (350 CR).");
+        return true;
+      }
+      const res = developAcademyDriver(doc, data.kind || "pace");
+      if (res.gained <= 0) {
+        ui.toast(res.message);
+        return true;
+      }
+      s.credits -= cost;
+      refresh();
+      ui.toast(res.message);
+      return true;
+    }
+    case "academy-promote": {
+      const doc = (s.academy || []).find((a) => a.uid === data.uid);
+      if (!doc) return true;
+      if (s.promotedAcademyId === doc.uid) {
+        s.promotedAcademyId = null;
+        refresh();
+        ui.toast(
+          `${doc.name} retornou à Academia. ${driverCatalog[s.selectedDriver].name} reassumiu a vaga titular.`,
+        );
+      } else {
+        s.promotedAcademyId = doc.uid;
+        refresh();
+        ui.toast(
+          `${doc.name} promovido a Piloto Titular da ${s.team?.name || "equipe"}!`,
+        );
+      }
+      return true;
+    }
     case "pilot": {
       const id = Number(data.id),
         d = driverCatalog[id];
@@ -167,8 +460,9 @@ export function handleExtraAction(g, action, data) {
         s.unlockedDrivers.push(id);
       }
       s.selectedDriver = id;
+      s.promotedAcademyId = null;
       refresh();
-      ui.toast(d.name + " contratado e selecionado.");
+      ui.toast(d.name + " contratado e selecionado como titular.");
       return true;
     }
     case "buy-car": {
@@ -458,8 +752,10 @@ export function handleExtraAction(g, action, data) {
     case "admin-damage":
       if (g.admin.active && g.race) {
         g.race.cars[0].damage = 0.65;
-        g.race.cars[0].impact = 30;
-        ui.toast("Impacto de teste registrado.");
+        g.race.cars[0].impact = 56;
+        if (g.race.cars[0].ruleState) g.race.cars[0].ruleState.peakImpact = 56;
+        if (g.race.time <= 8) g.race.time = 10;
+        ui.toast("Impacto severo registrado · Safety Car acionado.");
       }
       return true;
     case "admin-pit":

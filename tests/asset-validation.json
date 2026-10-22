@@ -1,210 +1,210 @@
 [
   {
     "file": "public/assets/cars/models/apex-07.glb",
-    "bytes": 184184,
-    "meshes": 8,
-    "triangles": 1852,
+    "bytes": 616368,
+    "meshes": 9,
+    "triangles": 6308,
     "dimensions_m": [
-      3.37,
-      1.795,
+      3.415,
+      1.852,
       5.41
     ],
     "bounds_min": [
-      -1.685,
+      -1.707,
       0.01,
-      -2.58
+      -2.6
     ]
   },
   {
     "file": "public/assets/cars/models/azure-18.glb",
-    "bytes": 189360,
-    "meshes": 8,
-    "triangles": 1924,
+    "bytes": 621544,
+    "meshes": 9,
+    "triangles": 6380,
     "dimensions_m": [
-      3.37,
-      1.795,
+      3.415,
+      1.852,
       5.41
     ],
     "bounds_min": [
-      -1.685,
+      -1.707,
       0.01,
-      -2.58
+      -2.6
     ]
   },
   {
     "file": "public/assets/cars/models/baxter-00.glb",
-    "bytes": 191092,
-    "meshes": 8,
-    "triangles": 1948,
+    "bytes": 622420,
+    "meshes": 9,
+    "triangles": 6392,
     "dimensions_m": [
-      3.37,
-      1.905,
+      3.415,
+      1.852,
       5.41
     ],
     "bounds_min": [
-      -1.685,
+      -1.707,
       0.01,
-      -2.58
+      -2.6
     ]
   },
   {
     "file": "public/assets/cars/models/ember-22.glb",
-    "bytes": 190244,
-    "meshes": 8,
-    "triangles": 1936,
+    "bytes": 622428,
+    "meshes": 9,
+    "triangles": 6392,
     "dimensions_m": [
-      3.37,
-      1.795,
+      3.415,
+      1.852,
       5.41
     ],
     "bounds_min": [
-      -1.685,
+      -1.707,
       0.01,
-      -2.58
+      -2.6
     ]
   },
   {
     "file": "public/assets/cars/models/helix-36.glb",
-    "bytes": 195424,
-    "meshes": 8,
-    "triangles": 2008,
+    "bytes": 626744,
+    "meshes": 9,
+    "triangles": 6452,
     "dimensions_m": [
-      3.37,
-      1.905,
+      3.415,
+      1.852,
       5.41
     ],
     "bounds_min": [
-      -1.685,
+      -1.707,
       0.01,
-      -2.58
+      -2.6
     ]
   },
   {
     "file": "public/assets/cars/models/kestrel-14.glb",
-    "bytes": 191100,
-    "meshes": 8,
-    "triangles": 1948,
+    "bytes": 622424,
+    "meshes": 9,
+    "triangles": 6392,
     "dimensions_m": [
-      3.37,
-      1.815,
+      3.415,
+      1.852,
       5.41
     ],
     "bounds_min": [
-      -1.685,
+      -1.707,
       0.01,
-      -2.58
+      -2.6
     ]
   },
   {
     "file": "public/assets/cars/models/obsidian-27.glb",
-    "bytes": 192824,
-    "meshes": 8,
-    "triangles": 1972,
+    "bytes": 624144,
+    "meshes": 9,
+    "triangles": 6416,
     "dimensions_m": [
-      3.37,
-      1.86,
+      3.415,
+      1.852,
       5.41
     ],
     "bounds_min": [
-      -1.685,
+      -1.707,
       0.01,
-      -2.58
+      -2.6
     ]
   },
   {
     "file": "public/assets/cars/models/orion-63.glb",
-    "bytes": 191088,
-    "meshes": 8,
-    "triangles": 1948,
+    "bytes": 623276,
+    "meshes": 9,
+    "triangles": 6404,
     "dimensions_m": [
-      3.37,
-      1.795,
+      3.415,
+      1.852,
       5.41
     ],
     "bounds_min": [
-      -1.685,
+      -1.707,
       0.01,
-      -2.58
+      -2.6
     ]
   },
   {
     "file": "public/assets/cars/models/solstice-44.glb",
-    "bytes": 188516,
-    "meshes": 8,
-    "triangles": 1912,
+    "bytes": 620704,
+    "meshes": 9,
+    "triangles": 6368,
     "dimensions_m": [
-      3.37,
-      1.795,
+      3.415,
+      1.852,
       5.41
     ],
     "bounds_min": [
-      -1.685,
+      -1.707,
       0.01,
-      -2.58
+      -2.6
     ]
   },
   {
     "file": "public/assets/cars/models/stratos-59.glb",
-    "bytes": 195412,
-    "meshes": 8,
-    "triangles": 2008,
+    "bytes": 626732,
+    "meshes": 9,
+    "triangles": 6452,
     "dimensions_m": [
-      3.37,
-      1.86,
+      3.415,
+      1.852,
       5.41
     ],
     "bounds_min": [
-      -1.685,
+      -1.707,
       0.01,
-      -2.58
+      -2.6
     ]
   },
   {
     "file": "public/assets/cars/models/tempest-48.glb",
-    "bytes": 195408,
-    "meshes": 8,
-    "triangles": 2008,
+    "bytes": 626732,
+    "meshes": 9,
+    "triangles": 6452,
     "dimensions_m": [
-      3.37,
-      1.815,
+      3.415,
+      1.852,
       5.41
     ],
     "bounds_min": [
-      -1.685,
+      -1.707,
       0.01,
-      -2.58
+      -2.6
     ]
   },
   {
     "file": "public/assets/cars/models/verdant-31.glb",
-    "bytes": 187640,
-    "meshes": 8,
-    "triangles": 1900,
+    "bytes": 619824,
+    "meshes": 9,
+    "triangles": 6356,
     "dimensions_m": [
-      3.37,
-      1.795,
+      3.415,
+      1.852,
       5.41
     ],
     "bounds_min": [
-      -1.685,
+      -1.707,
       0.01,
-      -2.58
+      -2.6
     ]
   },
   {
     "file": "public/assets/tracks/models/barrier-concrete.glb",
-    "bytes": 4080,
-    "meshes": 2,
-    "triangles": 24,
+    "bytes": 5972,
+    "meshes": 3,
+    "triangles": 36,
     "dimensions_m": [
       4,
       1.15,
-      0.67
+      0.78
     ],
     "bounds_min": [
       -2,
       0,
-      -0.335
+      -0.39
     ]
   },
   {

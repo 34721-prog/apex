@@ -38,50 +38,14 @@ export function renderRaceHUD(ui) {
   return `<section id="race-hud" class="rc-hud" data-mode="${s.hudMode}" data-driving="${r.isDelegated() ? "manager" : "manual"}" aria-label="HUD de corrida">
  <header class="hud-top"><div class="hud-brand"><strong>APEX<span>DYNASTY</span><i>LIVE</i></strong><small>${html(r.trackName)}</small></div><div class="hud-clocks"><div><small>VOLTA</small><b id="hud-lap">1 / ${r.laps}</b></div><div><small>VOLTA ATUAL</small><b id="hud-time">0:00.000</b></div><div class="hud-reference"><small>MELHOR PESSOAL</small><b id="hud-best">—</b></div><div class="hud-reference"><small>Δ MELHOR DA SESSÃO</small><b id="hud-delta">—</b></div><div class="hud-total"><small>TEMPO DE PROVA</small><b id="hud-race-time">0:00.000</b></div></div><div id="hud-status" class="hud-flag">GRID</div><button class="hud-icon" data-action="pause" aria-label="Pausar">${icon("pause")}</button></header>
  <div class="manager-control-banner"><b>${r.isDelegated() ? "CHEFE · IA AUTÔNOMA" : "MANUAL · CARRO 1"}</b><button data-action="manager-drive">${r.isDelegated() ? "DIRIGIR (OPCIONAL)" : "VOLTAR A GERENCIAR"}</button><select data-manager-focus aria-label="Carro acompanhado">${r.cars.map((c) => `<option value="${c.id}" ${(g.world.focusId || 0) === c.id ? "selected" : ""}>C${c.id + 1} · ${html(c.name)}</option>`).join("")}</select></div>
- <aside class="hud-tower hud-clutter"><div class="tower-heading"><b id="hud-position">P${r.cars.length}</b><span>CLASSIFICAÇÃO<small>INTERVALOS DE PASSAGEM</small></span><i id="hud-grid-size">${r.cars.length} ${r.cars.length === 1 ? "CARRO" : "CARROS"}</i></div><ol id="leaderboard">${r.cars.map((c) => `<li class="race-entry ${c.id === 0 ? "player" : ""}" data-car="${c.id}"><b class="entry-pos"></b><span class="entry-number" style="--team:${pitTeams[c.teamId].color}">${c.number}</span><div class="entry-name"><strong>${html(c.id === 0 ? driverCatalog[c.driverId].name : c.name)}</strong><small>${pitTeams[c.teamId].name}${c.teamId === r.cars[0].teamId ? " · SUA EQUIPE" : ""}</small></div><span class="entry-gap">—</span><i class="entry-change"></i></li>`).join("")}</ol><small class="tower-note">${r.difficulty.toUpperCase()} · ${r.weather === "rain" ? "CHUVA" : "SECO"} · ${r.realism === "realistic" ? "REALISTA" : "ARCADE"}</small></aside>
+ <aside class="hud-tower hud-clutter"><div class="tower-heading"><b id="hud-position">P${r.cars.length}</b><span>CLASSIFICAÇÃO<small>INTERVALOS DE PASSAGEM</small></span><i id="hud-grid-size">${r.cars.length} ${r.cars.length === 1 ? "CARRO" : "CARROS"}</i></div><ol id="leaderboard">${r.cars.map((c) => `<li class="race-entry ${c.id === 0 ? "player" : ""}" data-car="${c.id}"><b class="entry-pos"></b><span class="entry-number" style="--team:${pitTeams[c.teamId].color}">${c.number}</span><div class="entry-name"><strong>${html(c.id === 0 ? c.academyDriver?.name || driverCatalog[c.driverId].name : c.name)}</strong><small>${pitTeams[c.teamId].name}${c.teamId === r.cars[0].teamId ? " · SUA EQUIPE" : ""}</small></div><span class="entry-gap">—</span><i class="entry-change"></i></li>`).join("")}</ol><small class="tower-note">${r.difficulty.toUpperCase()} · ${r.weather === "rain" ? "CHUVA" : "SECO"} · ${r.realism === "realistic" ? "REALISTA" : "ARCADE"}</small></aside>
  <div id="countdown" class="hud-countdown"><div class="start-lights">${Array.from({ length: 5 }, () => "<i></i>").join("")}</div><b id="start-number">5</b><small>PREPARE-SE PARA A LARGADA</small></div>
  <aside class="hud-director" id="hud-director" hidden><b id="hud-director-flag"></b><span id="hud-director-instruction"></span><small id="hud-weather"></small></aside><div id="race-message" class="hud-alert" role="status" aria-live="polite"></div>
  <aside class="hud-map hud-clutter"><div><b>MAPA DO CIRCUITO</b><span>● VOCÊ</span></div><canvas id="minimap" width="420" height="270"></canvas></aside>
  <section class="hud-resources hud-clutter" id="resource-data"><div><small>COMBUSTÍVEL</small><b id="hud-fuel">—</b><span id="hud-range">—</span></div><div><small>PNEUS</small><b id="hud-tire">—</b><span id="hud-temp">—</span></div><div><small>DANOS</small><b id="hud-damage">0%</b><span id="hud-damage-state">—</span></div><div class="hud-pit"><small>BOXES / <span id="hud-bay">G1</span></small><b id="hud-pit-state">NA PISTA</b><span id="hud-pit-time">0 paradas</span></div></section>
- <aside class="hud-car"><small id="hud-view-label" class="hud-camera-label" hidden>PILOTO ACOMPANHADO · CÂMERA NO SAFETY CAR</small><div class="hud-shift" id="rpm">${Array.from({ length: 16 }, () => "<i></i>").join("")}</div><div class="hud-speed-line"><span id="hud-gear">N</span><strong id="hud-speed">0</strong><small>KM/H</small></div><div class="hud-engine"><span id="hud-rpm">1.500 RPM</span><b id="hud-shift">AUTO</b></div><div class="pedal"><small>ACEL</small><i><em id="hud-throttle"></em></i></div><div class="pedal brake"><small>FREIO</small><i><em id="hud-brake"></em></i></div></aside>
- <aside id="f1-wheel-cockpit" class="f1-wheel-cockpit ${s.showWheelCockpit !== false ? "show" : ""}" aria-label="Volante F1 Multifuncional">
-   <div id="f1-wheel-body" class="f1-wheel-body">
-     <div class="f1-wheel-leds" id="wheel-rpm-leds">${Array.from({ length: 16 }, () => "<i></i>").join("")}</div>
-     <div class="f1-wheel-row">
-       <div class="f1-wheel-grip left">
-         <button class="wheel-btn drs" data-action="camera" title="Alternar Câmera">CAM</button>
-         <button class="wheel-btn radio" data-action="radio" title="Rádio Equipe">RAD</button>
-         <div class="wheel-vbar"><small>FREIO</small><i><em id="wheel-brake"></em></i></div>
-       </div>
-       <div class="f1-wheel-screen">
-         <div class="wheel-screen-top">
-           <span id="wheel-flag" class="wheel-badge">VERDE</span>
-           <b id="wheel-lap">V1/${r.laps}</b>
-           <span id="wheel-delta">Δ —</span>
-         </div>
-         <div class="wheel-screen-main">
-           <div class="wheel-speed-col"><small>KM/H</small><strong id="wheel-speed">0</strong></div>
-           <div class="wheel-gear-box"><small>MARCHA</small><b id="wheel-gear">N</b></div>
-           <div class="wheel-rpm-col"><small>RPM</small><b id="wheel-rpm">1500</b><span id="wheel-engine-temp">88°C</span></div>
-         </div>
-         <div class="wheel-screen-cells">
-           <div><small>PNEUS</small><b id="wheel-tire">MÉD 100%</b></div>
-           <div><small>COMB.</small><b id="wheel-fuel">100%</b></div>
-           <div><small>DANOS</small><b id="wheel-damage">0%</b></div>
-           <div><small>BOX</small><b id="wheel-pit">PISTA</b></div>
-         </div>
-         <div class="wheel-screen-radio" id="wheel-radio">PIT WALL PRONTO</div>
-       </div>
-       <div class="f1-wheel-grip right">
-         <button class="wheel-btn pit" data-action="pit-options" title="Solicitar Box">BOX</button>
-         <button class="wheel-btn mode" data-action="manager-drive" title="Alternar Manual/IA">MODO</button>
-         <div class="wheel-vbar throttle"><small>ACEL</small><i><em id="wheel-throttle"></em></i></div>
-       </div>
-     </div>
-   </div>
- </aside>
+ <aside class="hud-car"><small id="hud-view-label" class="hud-camera-label" hidden>PILOTO ACOMPANHADO · CÂMERA NO SAFETY CAR</small><div class="hud-shift" id="rpm">${Array.from({ length: 16 }, () => "<i></i>").join("")}</div><div class="hud-speed-line"><span id="hud-gear">N</span><strong id="hud-speed">0</strong><small>KM/H</small></div><div class="hud-engine"><span id="hud-rpm">1.500 RPM</span><b id="hud-shift">AUTO</b><span id="hud-drs" class="hud-drs-badge">DRS PRONTO</span></div><div class="pedal"><small>ACEL</small><i><em id="hud-throttle"></em></i></div><div class="pedal brake"><small>FREIO</small><i><em id="hud-brake"></em></i></div></aside>
  <div class="hud-strategy-slot">${r.manager ? managerPanel(g, true) : strategyPanel(s)}</div>
- <nav class="hud-toolbar" aria-label="Controles de corrida"><button data-action="pit-options">BOXES <kbd>P</kbd></button><button data-action="race-journal">REGRAS</button><button data-action="radio">RÁDIO <kbd>Q</kbd></button><button data-action="camera">CÂMERA <kbd>C</kbd></button><button data-action="toggle-wheel">VOLANTE F1</button><select data-pit-camera aria-label="CÂMERAS"><option value="">CÂMERAS</option><option value="overview">Circuito completo</option><option value="battle">Disputa próxima</option><option value="cockpit">Carro acompanhado</option><option value="broadcast">Transmissão</option><option value="pit-lane">Externa</option><option value="pit-garage">Garagem</option><option value="pit-follow">Entrada / saída</option><option value="pit-wheels">Pneus</option><option value="safety-car">Safety Car</option><option value="grandstands">Arquibancadas</option><option value="chase">Perseguição</option></select><button data-action="hud-mode" aria-label="Alternar modo do HUD">HUD <span id="hud-mode-label">${s.hudMode === "standard" ? "PADRÃO" : s.hudMode === "compact" ? "COMPACTO" : "IMERSIVO"}</span></button>${g.admin.active ? '<button data-action="admin-inspect">LAB</button>' : ""}</nav>
+ <nav class="hud-toolbar" aria-label="Controles de corrida"><button data-action="pit-options">BOXES <kbd>P</kbd></button><button data-action="race-journal">REGRAS</button><button data-action="radio">RÁDIO <kbd>Q</kbd></button><button data-action="camera">CÂMERA <kbd>C</kbd></button><select data-pit-camera aria-label="CÂMERAS"><option value="">CÂMERAS</option><option value="overview">Circuito completo</option><option value="battle">Disputa próxima</option><option value="cockpit">Carro acompanhado</option><option value="broadcast">Transmissão</option><option value="pit-lane">Externa</option><option value="pit-garage">Garagem</option><option value="pit-follow">Entrada / saída</option><option value="pit-wheels">Pneus</option><option value="safety-car">Safety Car</option><option value="grandstands">Arquibancadas</option><option value="chase">Perseguição</option></select><button data-action="hud-mode" aria-label="Alternar modo do HUD">HUD <span id="hud-mode-label">${s.hudMode === "standard" ? "PADRÃO" : s.hudMode === "compact" ? "COMPACTO" : "IMERSIVO"}</span></button>${g.admin.active ? '<button data-action="admin-inspect">LAB</button>' : ""}</nav>
  <div id="engineer-radio" class="hud-radio"><b>ENGENHEIRO</b><span id="hud-radio-text"></span></div><small id="fps-counter"></small>
  <div class="touch-controls rc-touch"><button data-touch="left" aria-label="Virar à esquerda">${icon("left")}</button><button data-touch="right" aria-label="Virar à direita">${icon("chevron")}</button><button data-touch="brake">FREAR</button><button data-touch="throttle">ACELERAR</button></div>
  </section>`;
@@ -206,67 +170,9 @@ export function updateRaceHUD(ui, race, now) {
   const leds = el("rpm").children,
     lit = Math.round((rpm / 14000) * 16);
   for (let i = 0; i < leds.length; i++) leds[i].classList.toggle("on", i < lit);
-  const wheelCockpit = el("f1-wheel-cockpit");
-  if (wheelCockpit) {
-    const showWheel =
-      ui.game.save.settings.showWheelCockpit !== false ||
-      ["cockpit", "hood"].includes(ui.game.world.cameraMode);
-    wheelCockpit.classList.toggle("show", showWheel);
-    if (showWheel) {
-      const wheelBody = el("f1-wheel-body");
-      if (wheelBody) {
-        const deg = Math.max(-42, Math.min(42, -(c.steer || 0) * 32));
-        wheelBody.style.transform = `rotate(${deg.toFixed(1)}deg)`;
-      }
-      const wLeds = el("wheel-rpm-leds")?.children || [];
-      for (let i = 0; i < wLeds.length; i++) wLeds[i].classList.toggle("on", i < lit);
-      set("wheel-speed", Math.round(c.speed * 3.6));
-      set("wheel-gear", gearFor(c) || "N");
-      set("wheel-rpm", rpm);
-      set("wheel-engine-temp", Math.round(c.engineTemp ?? 88) + "°C");
-      set(
-        "wheel-lap",
-        "V" + Math.min(race.laps, c.lap + 1) + "/" + (race.mode === "practice" ? "∞" : race.laps),
-      );
-      set(
-        "wheel-delta",
-        delta === null ? "Δ —" : "Δ " + (delta >= 0 ? "+" : "") + delta.toFixed(2),
-      );
-      const wThrottle = el("wheel-throttle");
-      if (wThrottle) wThrottle.style.transform = `scaleY(${c.throttle || 0})`;
-      const wBrake = el("wheel-brake");
-      if (wBrake) wBrake.style.transform = `scaleY(${c.brake || 0})`;
-      const tComp = compounds[c.tires.compound] || compounds.medium;
-      set(
-        "wheel-tire",
-        tComp.label.slice(0, 3).toUpperCase() + " " + Math.round(c.tires.health * 100) + "%",
-      );
-      set(
-        "wheel-fuel",
-        race.realism === "arcade" ? "AUTO" : c.fuel.toFixed(1) + "L",
-      );
-      set("wheel-damage", Math.round((c.damage || 0) * 100) + "%");
-      set(
-        "wheel-pit",
-        c.pit.state !== "track"
-          ? c.pit.state.toUpperCase()
-          : c.pit.requested
-            ? "BOX SOLIC."
-            : "PISTA",
-      );
-      set(
-        "wheel-flag",
-        race.flag === "yellow" ? "AMARELA / SC" : c.finished ? "FIM" : "VERDE",
-      );
-      const e = ui.game.engineer;
-      set(
-        "wheel-radio",
-        e?.until > race.time && e?.message
-          ? e.message.slice(0, 48)
-          : c.strategyAdvice?.message?.slice(0, 48) || "TELEMETRIA OK",
-      );
-    }
-  }
+  const drsActive = c.speed > 56 && c.throttle > 0.85 && Math.abs(c.steer || 0) < 0.08 && race.flag === "green";
+  set("hud-drs", drsActive ? "DRS ATIVO" : race.flag === "yellow" ? "DRS BLOQ" : "DRS PRONTO");
+  if (el("hud-drs")) el("hud-drs").dataset.active = drsActive ? "1" : "0";
   for (let i = 0; i < order.length; i++) {
     const car = order[i],
       row = ui.hudRows.get(car.id);

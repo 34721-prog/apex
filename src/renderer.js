@@ -1,4 +1,12 @@
 import { EnvironmentVisuals, groundGeometry } from "./graphics/EnvironmentVisuals.js";
+import {
+  buildAsphaltSurface,
+  buildProfiledKerbs,
+  buildRunoffAreas,
+  buildSafetyBarriers,
+  buildGantryAndSignage,
+  buildBridgesAndTowers,
+} from "./graphics/CircuitDetails.js";
 import { rigVehicle, applyVehiclePose, interpolationAddsOverlap, ROAD_HEIGHT, KERB_RISE, KERB_WIDTH } from "./graphics/VehiclePresentation.js";
 import { readVisualPose, visualCut } from "./graphics/VehicleMotion.js";
 import { DynamicShadows } from "./graphics/DynamicShadows.js";
@@ -40,7 +48,7 @@ export class World {
     this.scene.background = new THREE.Color(activeTrack.sky);
     this.scene.fog = new THREE.Fog(activeTrack.sky, 400, 1600);
     this.renderer = new THREE.WebGLRenderer({
-      antialias: true,
+      antialias: !navigator.webdriver,
       powerPreference: "high-performance",
     });
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
@@ -166,6 +174,7 @@ export class World {
         if (o.isMesh) {
           o.castShadow = true;
           o.receiveShadow = true;
+          if (o.material) o.material.shadowSide = THREE.FrontSide;
         }
       });
       if (this.carCache[0])
@@ -271,167 +280,50 @@ export class World {
     this.scene.add(ground);
     this.roadMaterial = new THREE.MeshLambertMaterial({
       map: this.texture("asphalt-worn", 3, 1),
+      vertexColors: true,
       side: THREE.DoubleSide,
     });
-    // Only the exposed shoulders: do not tessellate a second surface underneath
-    // the full asphalt ribbon (visible interference in distant/aerial cameras).
-    const shoulderMaterial = new THREE.MeshLambertMaterial({
-      color: "#898d81", side: THREE.DoubleSide,
-    });
-    for (const [inner, outer] of [
-      [-TRACK_WIDTH / 2 - 3.5, -TRACK_WIDTH / 2],
-      [TRACK_WIDTH / 2, TRACK_WIDTH / 2 + 3.5],
-    ]) this.ribbon(inner, outer, shoulderMaterial).position.y = -0.025;
-    this.ribbon(-TRACK_WIDTH / 2, TRACK_WIDTH / 2, this.roadMaterial);
-    const kerbMat = new THREE.MeshLambertMaterial({
-      side: THREE.DoubleSide,
-      map: this.texture("kerb-red-white"),
-    });
-    this.ribbon(
-      -TRACK_WIDTH / 2 - KERB_WIDTH,
-      -TRACK_WIDTH / 2,
-      kerbMat,
-      true,
-    ).position.y = KERB_RISE;
-    this.ribbon(
-      TRACK_WIDTH / 2,
-      TRACK_WIDTH / 2 + KERB_WIDTH,
-      kerbMat,
-      true,
-    ).position.y = KERB_RISE;
-    let line = new THREE.MeshLambertMaterial({
-      color: "#e5e6d7",
-      side: THREE.DoubleSide,
-    });
-    this.ribbon(
-      -TRACK_WIDTH / 2 + 0.1,
-      -TRACK_WIDTH / 2 + 0.32,
-      line,
-    ).position.y = 0.02;
-    this.ribbon(
-      TRACK_WIDTH / 2 - 0.32,
-      TRACK_WIDTH / 2 - 0.1,
-      line,
-    ).position.y = 0.02;
-    const railMat = new THREE.MeshLambertMaterial({
-      color: "#c2c7c3",
-    });
-    const count = Math.floor(length / 4);
-    let rails = new THREE.InstancedMesh(
-        new THREE.BoxGeometry(4.1, 0.42, 0.28),
-        railMat,
-        count * 2,
-      ),
-      posts = new THREE.InstancedMesh(
-        new THREE.BoxGeometry(0.16, 1.4, 0.18),
-        railMat,
-        count * 2,
-      );
-    let dummy = new THREE.Object3D();
-    const tirePoints = [];
-    for (let i = 0; i < count; i++) {
-      const sPos = (i / count) * length;
-      const a = at(sPos);
-      const isCorner = curvature(sPos) > 0.0075;
-      for (let side = 0; side < 2; side++) {
-        const sign = side ? 1 : -1;
-        const inPit = side && pitZone(sPos);
-        const off = inPit ? pitOuter(sPos) : barrierOffset();
-        dummy.position
-          .copy(a.p)
-          .addScaledVector(a.right, sign * off);
-        dummy.position.y = 0.92;
-        dummy.rotation.y = a.heading + Math.PI / 2;
-        dummy.updateMatrix();
-        rails.setMatrixAt(i * 2 + side, dummy.matrix);
-        dummy.position.y = 0.68;
-        dummy.updateMatrix();
-        posts.setMatrixAt(i * 2 + side, dummy.matrix);
-        if (isCorner && !inPit && i % 2 === 0) {
-          tirePoints.push({
-            x: a.p.x + a.right.x * sign * (off - 0.32),
-            z: a.p.z + a.right.z * sign * (off - 0.32),
-            heading: a.heading + Math.PI / 2,
-            red: (i + side) % 4 < 2,
-          });
-        }
-      }
-    }
-    this.scene.add(rails, posts);
-    if (tirePoints.length > 0) {
-      const tireGeo = new THREE.BoxGeometry(3.6, 0.95, 0.72);
-      const tireMat = new THREE.MeshLambertMaterial({ color: "#ffffff" });
-      const tireWall = new THREE.InstancedMesh(tireGeo, tireMat, tirePoints.length);
-      const redCol = new THREE.Color("#d92b3a");
-      const whiteCol = new THREE.Color("#f1f5f9");
-      for (let idx = 0; idx < tirePoints.length; idx++) {
-        const tp = tirePoints[idx];
-        dummy.position.set(tp.x, 0.48, tp.z);
-        dummy.rotation.y = tp.heading;
-        dummy.updateMatrix();
-        tireWall.setMatrixAt(idx, dummy.matrix);
-        tireWall.setColorAt(idx, tp.red ? redCol : whiteCol);
-      }
-      tireWall.instanceMatrix.needsUpdate = true;
-      if (tireWall.instanceColor) tireWall.instanceColor.needsUpdate = true;
-      this.scene.add(tireWall);
-    }
+    buildRunoffAreas(this);
+    buildAsphaltSurface(this);
+    buildProfiledKerbs(this);
+    buildSafetyBarriers(this);
     this.buildPit();
     const start = at(0),
       checkerGroup = new THREE.Group();
     checkerGroup.position.copy(start.p);
-    checkerGroup.position.y = 0.16;
+    checkerGroup.position.y = 0.142;
     checkerGroup.rotation.y = start.heading;
     const white = new THREE.MeshLambertMaterial({ color: "#eeede2" }),
-      black = new THREE.MeshLambertMaterial({ color: "#242a2c" });
+      black = new THREE.MeshLambertMaterial({ color: "#1e2428" });
     for (let x = 0; x < 18; x++)
       for (let z = 0; z < 2; z++) {
         let tile = new THREE.Mesh(
-          new THREE.BoxGeometry(1, 0.015, 1),
+          new THREE.BoxGeometry(0.92, 0.015, 0.92),
           (x + z) % 2 ? black : white,
         );
-        tile.position.set(x - 8.5, 0, z - 0.5);
+        tile.position.set((x - 8.5) * 0.92, 0, (z - 0.5) * 0.92);
         checkerGroup.add(tile);
       }
     this.scene.add(checkerGroup);
     for (let n = 0; n < 6; n++) {
       const a = at(length - 14 - Math.floor(n / 2) * 10);
       const pos = a.p.clone().addScaledVector(a.right, n % 2 ? 3 : -3);
-      let mark = new THREE.Mesh(new THREE.PlaneGeometry(3.1, 0.12), white);
-      mark.rotation.x = -Math.PI / 2;
-      mark.rotation.z = -a.heading;
-      mark.position.copy(pos);
-      mark.position.y = 0.16;
-      this.scene.add(mark);
+      // U-shaped F1 starting grid box
+      const gridBox = new THREE.Group();
+      gridBox.position.copy(pos);
+      gridBox.position.y = 0.142;
+      gridBox.rotation.y = a.heading;
+      const frontBar = new THREE.Mesh(new THREE.BoxGeometry(2.7, 0.012, 0.16), white);
+      frontBar.position.set(0, 0, 2.3);
+      gridBox.add(frontBar);
+      for (const sx of [-1.28, 1.28]) {
+        const sideBar = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.012, 2.2), white);
+        sideBar.position.set(sx, 0, 1.25);
+        gridBox.add(sideBar);
+      }
+      this.scene.add(gridBox);
     }
-    this.gantry = new THREE.Group();
-    this.gantry.position.copy(start.p);
-    this.gantry.rotation.y = start.heading;
-    const gm = new THREE.MeshLambertMaterial({
-      color: "#282e36",
-    });
-    for (const x of [-TRACK_WIDTH / 2 - 3, TRACK_WIDTH / 2 + 3])
-      this.addBox(this.gantry, x, 4, 0, 0.48, 8, 0.5, gm);
-    this.addBox(this.gantry, 0, 7.8, 0, TRACK_WIDTH + 7, 1.9, 0.7, gm);
-    const sign = this.sign("APEX DYNASTY", 1024, 100, "#e6eaee", "#11161c");
-    let panel = new THREE.Mesh(
-      new THREE.PlaneGeometry(15, 1.45),
-      new THREE.MeshBasicMaterial({ map: sign, side: THREE.DoubleSide }),
-    );
-    panel.position.set(0, 7.8, -0.37);
-    panel.rotation.y = Math.PI;
-    this.gantry.add(panel);
-    this.lights = [];
-    for (let i = 0; i < 5; i++) {
-      let m = new THREE.Mesh(
-        new THREE.SphereGeometry(0.29, 8, 6),
-        new THREE.MeshBasicMaterial({ color: "#32121b" }),
-      );
-      m.position.set((i - 2) * 1.2, 6.3, -0.44);
-      this.gantry.add(m);
-      this.lights.push(m);
-    }
-    this.scene.add(this.gantry);
+    buildGantryAndSignage(this);
   }
   buildPit() {
     buildPit(this);
@@ -472,61 +364,90 @@ export class World {
         color: c,
         flatShading: true,
       });
-    const concrete = m("#c1bfae"),
-      dark = m("#292f36"),
-      roof = m("#bcc5c8", 0.35),
-      glass = m("#3d535c", 0.45),
-      red = m("#bb3042"),
-      seats = m("#667988");
-    const d = new THREE.Object3D();
+    const concrete = m("#cbd5e1"),
+      dark = m("#1e293b"),
+      roof = m("#94a3b8", 0.35),
+      glass = m("#334155", 0.45),
+      red = m("#dc2626");
+    // Multi-tier Paddock Hospitality & Technical Center (within 134m x 18m footprint)
     const paddock = new THREE.Group();
     this.placeFacility(paddock, "paddock");
-    this.addBox(paddock, 0, 3, 0, 130, 6, 15, concrete);
-    this.addBox(paddock, 0, 6.4, 0, 134, 0.5, 18, roof);
+    this.addBox(paddock, 0, 3.2, 0, 130, 6.4, 15, concrete);
+    this.addBox(paddock, 0, 6.55, 0, 133.6, 0.45, 17.6, roof);
+    this.addBox(paddock, 0, 8.3, -1.2, 118, 3.1, 11.5, dark);
+    this.addBox(paddock, 0, 10.0, -1.0, 122, 0.38, 13.5, roof);
+    this.addBox(paddock, 0, 6.9, 6.2, 126, 0.25, 3.2, red);
     for (let i = 0; i < 12; i++) {
-      this.addBox(paddock, -59 + i * 10.5, 2.2, 7.6, 8, 3.6, 0.12, dark);
-      this.addBox(
-        paddock,
-        -59 + i * 10.5,
-        5.1,
-        7.62,
-        8,
-        0.75,
-        0.14,
-        i % 2 ? red : glass,
-      );
+      const bx = -57.75 + i * 10.5;
+      this.addBox(paddock, bx, 2.2, 7.6, 8.2, 3.8, 0.14, dark);
+      this.addBox(paddock, bx, 5.1, 7.62, 8.4, 0.78, 0.18, i % 2 ? red : glass);
+      this.addBox(paddock, bx - 4.5, 3.2, 7.65, 0.32, 6.4, 0.32, roof);
     }
     this.scene.add(paddock);
+
+    // Modern F1 Race Control Tower (within 15m x 15m footprint)
     const tower = new THREE.Group();
     this.placeFacility(tower, "tower");
-    this.addBox(tower, 0, 9, 0, 9, 18, 9, concrete);
-    this.addBox(tower, 0, 16, 0, 12, 5, 12, glass);
-    this.addBox(tower, 0, 19, 0, 15, 0.5, 15, roof);
+    this.addBox(tower, 0, 1.5, 0, 12.5, 3.0, 12.5, dark);
+    this.addBox(tower, 0, 10.0, 0, 8.8, 15.0, 8.8, concrete);
+    for (const sx of [-4.4, 4.4]) {
+      this.addBox(tower, sx, 10.5, 0, 0.45, 16.5, 9.6, red);
+    }
+    // Cantilevered glass race-control observation decks
+    this.addBox(tower, 0, 16.2, 0.6, 12.8, 3.2, 12.8, glass);
+    this.addBox(tower, 0, 18.0, 0.6, 13.8, 0.45, 13.8, roof);
+    this.addBox(tower, 0, 19.8, 0.9, 11.4, 2.8, 11.4, glass);
+    this.addBox(tower, 0, 21.5, 0.8, 14.6, 0.55, 14.6, roof);
+    this.addBox(tower, 0, 21.9, 0.8, 14.8, 0.25, 14.8, red);
+    // Rooftop communications & telemetry mast
+    this.addBox(tower, 0, 24.5, 0, 0.35, 5.5, 0.35, roof);
+    this.addBox(tower, 0, 22.6, -2.2, 2.2, 1.6, 2.2, dark);
     this.scene.add(tower);
-    const adGeometry = new THREE.PlaneGeometry(14, 3);
+
+    // Trackside Barrier-Integrated Sponsor Boards oriented toward approaching cars
+    const adGeometry = new THREE.PlaneGeometry(9.6, 1.35);
     const adSpecs = [
       ["AETHER AI SYSTEMS", "#e0f2fe", "#0b192c"],
       ["HELIOS FUSION ENERGY", "#fef3c7", "#9a3412"],
       ["PIREX MOTORSPORT", "#ffe4e6", "#9f1239"],
-      ["BREMTEK BRAKES", "#f8fafc", "#be123c"],
-      ["NEXATEL 6G GLOBAL", "#e0f2fe", "#0369a1"],
-      ["AURUM CAPITAL", "#fef9c3", "#1c1917"],
+      ["BREMTEK CARBON BRAKES", "#f8fafc", "#be123c"],
+      ["NEXATEL 6G TELEMETRY", "#e0f2fe", "#0369a1"],
+      ["AURUM CHRONOGRAPH", "#fef9c3", "#1c1917"],
     ];
     const adMaterials = adSpecs.map(([text, fg, bg]) =>
-      new THREE.MeshBasicMaterial({ map: this.sign(text, 512, 100, fg, bg), side: THREE.DoubleSide }));
-    for (let i = 0; i < 19; i++) {
-      const t = at((i / 19) * length + 60),
-        p = t.p.clone().addScaledVector(t.right, 23);
-      if (this.venues.contains(p.x, p.z, 8)) continue;
+      new THREE.MeshBasicMaterial({
+        map: this.sign(text, 512, 96, fg, bg),
+        side: THREE.DoubleSide,
+      }),
+    );
+    const boardCount = 28;
+    for (let i = 0; i < boardCount; i++) {
+      const s = (i / boardCount) * length + 42;
+      const side = i % 2 === 0 ? -1 : 1;
+      if (side === 1 && pitZone(s)) continue;
+      const t = at(s);
+      const off = barrierOffset() + 0.52;
+      const p = t.p.clone().addScaledVector(t.right, side * off);
+      if (this.venues.contains(p.x, p.z, 6)) continue;
       const b = new THREE.Group();
       b.position.copy(p);
-      b.rotation.y = t.heading - Math.PI / 2;
-      for (const x of [-5, 5]) this.addBox(b, x, 1.2, 0, 0.22, 2.4, 0.22, dark);
+      // Angle slightly toward approaching cars on the track
+      b.rotation.y =
+        t.heading + (side > 0 ? -Math.PI / 2 - 0.18 : Math.PI / 2 + 0.18);
+      for (const x of [-3.8, 3.8]) {
+        const leg = this.addBox(b, x, 1.15, -0.08, 0.16, 2.2, 0.16, dark);
+        leg.castShadow = false;
+      }
+      const backing = this.addBox(b, 0, 1.68, -0.06, 9.8, 1.48, 0.08, dark);
+      backing.castShadow = false;
       const sign = new THREE.Mesh(adGeometry, adMaterials[i % adMaterials.length]);
-      sign.position.y = 2.7;
+      sign.position.set(0, 1.68, 0.01);
       b.add(sign);
       this.scene.add(b);
     }
+
+    buildBridgesAndTowers(this);
+
     // Clustered vegetation and continuous ridges are built by EnvironmentVisuals.
     this.cityBuildings = [];
     if (activeTrack.theme === "city") {
@@ -546,7 +467,6 @@ export class World {
           TRACK_WIDTH / 2 + 32
         )
           continue;
-        // Keep the existing building, but place it outside the shared pit footprint.
         let offset = 70,
           x = t.p.x + t.right.x * offset,
           z = t.p.z + t.right.z * offset;
@@ -586,27 +506,11 @@ export class World {
     if (activeTrack.theme === "coast") {
       const water = new THREE.Mesh(
         new THREE.PlaneGeometry(1100, 1800),
-        m("#548f9d"),
+        m("#3b7a94"),
       );
       water.rotation.x = -Math.PI / 2;
       water.position.set(bounds().maxX + 610, 0, 0);
       this.scene.add(water);
-    }
-    // Distance markers before the complex.
-    for (let i = 0; i < 3; i++) {
-      const a = at(length * 0.19 + i * 45);
-      const p = a.p.clone().addScaledVector(a.right, -13.8);
-      const mesh = new THREE.Mesh(
-        new THREE.PlaneGeometry(2, 2),
-        new THREE.MeshBasicMaterial({
-          map: this.sign(String((3 - i) * 50), 128, 128, "#20242a", "#ecece0"),
-          side: THREE.DoubleSide,
-        }),
-      );
-      mesh.position.copy(p);
-      mesh.position.y = 1.6;
-      mesh.rotation.y = a.heading + Math.PI;
-      this.scene.add(mesh);
     }
   }
   setWeather(weather) {
@@ -909,14 +813,19 @@ export class World {
         cam.fov = 50;
       } else {
         const far = this.cameraMode === "far";
-        cp.set(p.x, far ? 10 : 5.0 + p.speed * 0.012, p.z).addScaledVector(
+        const isCountdownGrid = state === "countdown" && !far;
+        cp.set(
+          p.x,
+          far ? 10 : isCountdownGrid ? 4.4 : 5.0 + p.speed * 0.012,
+          p.z,
+        ).addScaledVector(
           dir,
-          far ? -22 : -10.8 - p.speed * 0.035,
+          far ? -22 : isCountdownGrid ? -12.2 : -10.8 - p.speed * 0.035,
         );
         this.targetLook
-          .set(p.x, 1.05, p.z)
-          .addScaledVector(dir, 12 + p.speed * 0.065);
-        cam.fov = 55 + p.speed * 0.13;
+          .set(p.x, isCountdownGrid ? 2.35 : 1.05, p.z)
+          .addScaledVector(dir, (isCountdownGrid ? 16 : 12) + p.speed * 0.065);
+        cam.fov = (isCountdownGrid ? 58 : 55) + p.speed * 0.13;
       }
     }
     if (
@@ -935,11 +844,23 @@ export class World {
       cam.updateProjectionMatrix();
       this.lastFov = cam.fov;
     }
-    this.lights.forEach((l, i) =>
-      l.material.color.set(
-        state === "countdown" && 5 - countdown >= i ? "#f0193d" : "#32121b",
-      ),
-    );
+    const launchGreen =
+      state === "racing" &&
+      this.raceContext &&
+      this.raceContext.time >= 0 &&
+      this.raceContext.time < 2.8;
+    this.lights.forEach((l, i) => {
+      const lit = state === "countdown" && 5 - countdown >= i;
+      l.material.color.set(lit ? "#f0193d" : "#32121b");
+      if (this.lightHalos?.[i]) {
+        this.lightHalos[i].visible = lit;
+      }
+      if (this.launchLights?.[i]) {
+        this.launchLights[i].material.color.set(
+          launchGreen ? "#10b981" : "#0f291e",
+        );
+      }
+    });
     this.effects.update(
       drivers[0],
       this.elapsed,

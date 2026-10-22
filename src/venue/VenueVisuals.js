@@ -248,33 +248,102 @@ export class VenueVisuals {
         pieces.push(geo);
       };
       const roofY = 0.62 + (v.rows - 1) * 0.52 + 2.7;
+      const topRowY = 0.62 + (v.rows - 1) * 0.52;
+      // Stepped concrete bowl, seat rows, and yellow-edged access stairways along empty aisle columns
+      const aisleX = [];
+      for (let col = 0; col < v.columns; col++) {
+        if (col % 21 === 10) {
+          aisleX.push(-(v.columns - 1) * 0.425 + col * 0.85);
+        }
+      }
       for (let row = 0; row < v.rows; row++) {
         const top = 0.62 + row * 0.52,
           z = -v.depth / 2 + 0.65 + row * 1.2;
+        // Concrete tier riser
         box(0, (top - 0.06) / 2, z, v.width, top + 0.06, 1.23, v.colors.base);
+        // Bucket seat row bank
         box(
           0,
           top + 0.15,
           z + 0.23,
           v.width - 1,
-          0.16,
-          0.6,
-          row % 3 === 0 ? v.colors.accent : "#526373",
+          0.18,
+          0.56,
+          row % 3 === 0 ? v.colors.accent : row % 2 === 0 ? "#475569" : "#334155",
         );
+        // Seat backrests
+        box(
+          0,
+          top + 0.32,
+          z + 0.46,
+          v.width - 1,
+          0.22,
+          0.12,
+          row % 3 === 0 ? v.colors.accent : "#64748b",
+        );
+        // Access stair steps & yellow safety nosing along aisle columns
+        for (const ax of aisleX) {
+          box(ax, top + 0.04, z, 1.05, 0.22, 1.18, "#94a3b8");
+          box(ax, top + 0.16, z - 0.45, 1.05, 0.05, 0.18, "#eab308");
+          if (row % 2 === 0) {
+            box(ax, top + 0.48, z, 0.06, 0.65, 1.15, "#cbd5e1");
+          }
+        }
       }
-      for (let x = -v.width / 2 + 2; x <= v.width / 2 - 1; x += 12) {
+      // Side end-cap walls & safety balustrades stepping up with the grandstand
+      const sideH = topRowY + 0.85;
+      for (const sx of [-v.width / 2 + 0.18, v.width / 2 - 0.18]) {
+        box(sx, sideH / 2 - 0.04, 0.4, 0.32, sideH, v.depth - 0.4, "#475569");
+        box(sx, sideH - 0.02, 0.4, 0.36, 0.22, v.depth - 0.2, v.colors.accent);
+      }
+      // Rear structural facade wall, columns, and cantilevered roof trusses
+      const rearH = topRowY + 0.78;
+      box(0, rearH / 2 - 0.04, v.depth / 2 - 0.22, v.width, rearH, 0.42, "#334155");
+      for (let x = -v.width / 2 + 2; x <= v.width / 2 - 1; x += 10) {
+        // Rear vertical steel mast
         box(
           x,
-          roofY / 2 - 0.03,
-          v.depth / 2 - 1,
-          0.22,
-          roofY + 0.06,
-          0.22,
-          "#344653",
+          roofY / 2,
+          v.depth / 2 - 0.6,
+          0.38,
+          roofY + 0.08,
+          0.45,
+          "#1e293b",
         );
+        // Diagonal raker brace behind the seating bowl
+        box(
+          x,
+          topRowY * 0.55 + 0.85,
+          v.depth * 0.16,
+          0.26,
+          0.32,
+          v.depth * 0.52,
+          "#334155",
+          -0.32,
+        );
+        if (v.roof) {
+          // Cantilevered overhead roof truss arm extending from rear mast to front edge
+          box(
+            x,
+            roofY - 0.22,
+            0,
+            0.24,
+            0.36,
+            v.depth + 1.6,
+            "#1e293b",
+            0.04,
+          );
+        }
       }
-      box(0, 0.3, v.depth / 2 - 1, v.width, 0.72, 2, v.colors.base);
-      box(0, 1.05, -v.depth / 2 - 0.3, v.width, 0.1, 0.12, "#b6c2cb");
+      // Lower rear concourse plinth
+      box(0, 0.35, v.depth / 2 - 1, v.width, 0.78, 2.1, v.colors.base);
+      // Front podium wall & safety railing with posts
+      box(0, 0.48, -v.depth / 2 - 0.12, v.width + 0.2, 0.96, 0.28, "#1e293b");
+      box(0, 0.88, -v.depth / 2 - 0.15, v.width + 0.24, 0.18, 0.32, v.colors.accent);
+      box(0, 1.24, -v.depth / 2 - 0.22, v.width, 0.08, 0.1, "#cbd5e1");
+      for (let rx = -v.width / 2 + 1; rx <= v.width / 2 - 1; rx += 4) {
+        box(rx, 1.08, -v.depth / 2 - 0.22, 0.08, 0.42, 0.08, "#94a3b8");
+      }
       if (v.roof) {
         if (v.theme === "coast" || v.theme === "desert") {
           for (const sign of [-1, 1])
@@ -282,25 +351,36 @@ export class VenueVisuals {
               0,
               roofY,
               v.depth * 0.24 * sign,
-              v.width + 2,
-              0.16,
-              v.depth * 0.54,
+              v.width + 2.4,
+              0.22,
+              v.depth * 0.56,
               v.colors.roof,
               sign * 0.07,
             );
-        } else
-          box(0, roofY, 0, v.width + 2, 0.18, v.depth + 2, v.colors.roof, 0.04);
+        } else {
+          box(0, roofY, 0, v.width + 2.4, 0.24, v.depth + 2.2, v.colors.roof, 0.04);
+          // Front roof fascia trim in circuit accent colour
+          box(
+            0,
+            roofY - 0.22,
+            -v.depth / 2 - 0.95,
+            v.width + 2.5,
+            0.34,
+            0.26,
+            v.colors.accent,
+          );
+        }
       }
       for (let i = 0; i < 3; i++) {
         const x = (i - 1) * (v.width / 2 - 4),
-          poleY = roofY + 2;
+          poleY = roofY + 2.2;
         box(
           x,
           poleY / 2 - 0.03,
           v.depth / 2 - 0.4,
-          0.12,
+          0.14,
           poleY + 0.06,
-          0.12,
+          0.14,
           "#647b8c",
         );
         temp.position.set(x, poleY - 0.5, v.depth / 2 - 0.4);
@@ -317,14 +397,19 @@ export class VenueVisuals {
         this.lamps.setMatrixAt(lampIndex++, matrix);
       }
       if (v.screen) {
-        box(v.width / 2 - 8, roofY + 1.5, 0, 0.3, 3, 0.3, "#35424e");
-        box(v.width / 2 - 8, roofY + 3.4, -0.05, 10.4, 5.5, 0.35, "#1a2735");
+        const sx = v.width / 2 - 8;
+        // Twin steel support pylons & frame for the Jumbotron screen
+        for (const dx of [-3.4, 3.4]) {
+          box(sx + dx, roofY + 1.6, 0.15, 0.36, 3.4, 0.38, "#334155");
+        }
+        box(sx, roofY + 3.4, -0.05, 10.8, 5.7, 0.45, "#0f172a");
+        box(sx, roofY + 6.35, -0.05, 11.0, 0.32, 0.52, v.colors.accent);
         const board = new THREE.Mesh(
           new THREE.PlaneGeometry(10, 5),
           this.boardMat,
         );
         board.rotation.y = Math.PI;
-        board.position.set(v.width / 2 - 8, roofY + 3.4, -0.24);
+        board.position.set(sx, roofY + 3.4, -0.29);
         group.add(board);
       }
       temp.position.set(0, 0.5, -v.depth / 2 - 0.4);

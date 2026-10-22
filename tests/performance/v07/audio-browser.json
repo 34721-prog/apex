@@ -45,6 +45,7 @@
     "realism": "arcade",
     "weather": "dry",
     "laps": 3,
+    "raceDistancePreset": "medium",
     "bots": 5,
     "tire": "medium",
     "voice": true,
@@ -55,6 +56,7 @@
     "invert": false,
     "steeringVersion": 2,
     "hudMode": "standard",
+    "showWheelCockpit": true,
     "strategyOpen": true,
     "aiStrategy": {
       "overtake": "balanced",

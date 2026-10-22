@@ -1,40 +1,40 @@
 [
   {
     "pace": "conserve",
-    "progress": 3921.182491734389,
-    "fuel": 16.833669850010548,
-    "health": 0.7081118029753346,
-    "temperature": 79.404791784401,
-    "grip": 0.8626791334027597,
+    "progress": 3942.229393474842,
+    "fuel": 16.709007788515823,
+    "health": 0.7105296599587569,
+    "temperature": 79.34874116090319,
+    "grip": 0.8635298791558336,
     "stats": {
       "maxSpeed": 69,
       "acceleration": 23,
       "handling": 1,
       "braking": 44,
-      "grip": 25.435000000000002,
+      "grip": 25.509999999999998,
       "stability": 1,
-      "consumption": 0.942,
+      "consumption": 0.9359999999999999,
       "durability": 1,
-      "tireWear": 0.9246
+      "tireWear": 0.9129
     }
   },
   {
     "pace": "aggressive",
-    "progress": 4533.635519201517,
-    "fuel": 16.108344787730545,
-    "health": 0.66265787575989,
-    "temperature": 81.43625638997008,
-    "grip": 0.8491398500470289,
+    "progress": 4585.863818887647,
+    "fuel": 16.022859631409634,
+    "health": 0.6650206202853727,
+    "temperature": 81.52371944321088,
+    "grip": 0.8503470665533195,
     "stats": {
       "maxSpeed": 69,
       "acceleration": 23,
       "handling": 1,
       "braking": 44,
-      "grip": 25.435000000000002,
+      "grip": 25.509999999999998,
       "stability": 1,
-      "consumption": 0.942,
+      "consumption": 0.9359999999999999,
       "durability": 1,
-      "tireWear": 0.9246
+      "tireWear": 0.9129
     }
   }
 ]

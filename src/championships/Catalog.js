@@ -17,8 +17,8 @@ export const seriesCatalog = [
     color: "#f33d59",
     category: "Fórmula principal",
     description:
-      "Seis Grandes Prêmios, treino, classificação real e campeonato de construtores.",
-    tracks: ["aurora", "alpine", "neon", "sahara", "sunset", "titan"],
+      "Oito Grandes Prêmios, treino, classificação real e campeonato de construtores.",
+    tracks: ["aurora", "imperiale", "alpine", "sakura", "neon", "lumina", "sahara", "titan"],
     laps: 4,
     sessions: ["practice", "qualifying", "race"],
     points: [25, 18, 15, 12, 10, 8],
@@ -38,7 +38,7 @@ export const seriesCatalog = [
     category: "Fórmula sprint",
     description:
       "Três etapas curtas. Classificação de uma volta e pontuação de sprint.",
-    tracks: ["neon", "vento", "oldtown"],
+    tracks: ["neon", "lumina", "oldtown"],
     laps: 2,
     sessions: ["qualifying", "race"],
     points: [8, 7, 6, 5, 4, 3],
@@ -58,7 +58,7 @@ export const seriesCatalog = [
     category: "Fórmula Junior",
     description:
       "Formação com motores de 54 m/s, aderência moderada e prêmio por consistência.",
-    tracks: ["aurora", "emerald", "nordic"],
+    tracks: ["aurora", "emerald", "sakura", "nordic"],
     laps: 3,
     sessions: ["practice", "qualifying", "race"],
     points: [15, 12, 10, 8, 6, 4],
@@ -78,7 +78,7 @@ export const seriesCatalog = [
     category: "Fórmula resistência",
     description:
       "Oito voltas por etapa, desgaste e chuva variável. Um piloto por carro, sem trocas fictícias.",
-    tracks: ["titan", "sahara", "discovery"],
+    tracks: ["titan", "imperiale", "sahara", "discovery"],
     laps: 8,
     sessions: ["qualifying", "race"],
     points: [30, 24, 20, 16, 12, 8],
@@ -98,7 +98,7 @@ export const seriesCatalog = [
     category: "Monomarca",
     description:
       "Mesma especificação física para todos. Disputa decidida por pilotagem e estratégia.",
-    tracks: ["veloce", "serpente", "sunset", "vento"],
+    tracks: ["veloce", "imperiale", "serpente", "sakura", "sunset", "vento"],
     laps: 3,
     sessions: ["qualifying", "race"],
     points: [20, 16, 13, 10, 8, 6],

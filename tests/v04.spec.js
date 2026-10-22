@@ -248,14 +248,14 @@ test("v0.4 all fourteen circuits select, load geometry, complete races, render m
   test.setTimeout(300000);
   const log = await boot(page);
   await page.getByRole("button", { name: "Circuitos", exact: true }).click();
-  await expect(page.locator(".circuit-card")).toHaveCount(14);
+  await expect(page.locator(".circuit-card")).toHaveCount(17);
   const ids = await page
     .locator(".circuit-card")
     .evaluateAll((nodes) => nodes.map((n) => n.dataset.trackId));
   const outlines = await page
     .locator(".circuit-thumb polyline:last-of-type")
     .evaluateAll((nodes) => nodes.map((n) => n.getAttribute("points")));
-  expect(new Set(outlines).size).toBe(14);
+  expect(new Set(outlines).size).toBe(17);
   await page.screenshot({ path: "tests/performance/v04/circuit-selector.png" });
   await page.evaluate(async () => {
     __game.frame = () => {};
@@ -348,12 +348,12 @@ test("v0.4 all fourteen circuits select, load geometry, complete races, render m
   await page.waitForFunction(() => __game?.world.assetsReady);
   expect(
     await page.evaluate(() => Object.keys(__game.save.records).length),
-  ).toBe(14);
+  ).toBe(17);
   await page.getByRole("button", { name: "Circuitos", exact: true }).click();
   await page
     .locator('[data-action=track-filter][data-category="Noite"]')
     .click();
-  await expect(page.locator(".circuit-card")).toHaveCount(2);
+  await expect(page.locator(".circuit-card")).toHaveCount(3);
   await page
     .locator('[data-action=track-filter][data-category="Procedurais"]')
     .click();

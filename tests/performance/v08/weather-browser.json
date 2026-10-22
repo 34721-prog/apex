@@ -5,10 +5,10 @@
     "message": "Pista molhada observada: considerar pneus de chuva",
     "action": "review",
     "compound": "wet",
-    "loss": 25.484347892319807,
+    "loss": 25.53846949010024,
     "traffic": [],
-    "gap": 0.9878869722501483,
-    "behindGap": 14.58783455821637,
+    "gap": null,
+    "behindGap": 22.409404283053966,
     "lap": 3
   }
 }

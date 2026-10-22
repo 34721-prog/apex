@@ -29,7 +29,7 @@ export class DynamicShadows {
     this.far = 500;
   }
   update(camera, look, cars, safetyCar) {
-    if (!this.renderer.shadowMap.enabled) return;
+    if (!this.renderer.shadowMap.enabled || this.light.shadow.autoUpdate === false) return;
     // Camera matrices must describe this frame, including its current lerp/zoom.
     camera.updateMatrixWorld();
     this.viewProjection.multiplyMatrices(

@@ -11,20 +11,48 @@ test("driver catalogue, real paint application, persistence, admin isolation and
 }) => {
   const errors = await boot(page);
   await page.getByRole("button", { name: "Pilotos", exact: true }).click();
-  await expect(page.locator(".driver-card")).toHaveCount(31);
+  await expect(page.locator("#driver-3d-canvas")).toHaveCount(0);
+  await expect(page.locator(".academy-mini-3d")).toHaveCount(0);
+  await expect(page.locator(".driver-sheet-hero")).toBeVisible();
+  await expect(page.locator(".driver-sheet-hero")).toContainText("Ritmo de classificação");
+  await expect(page.locator(".driver-sheet-hero")).toContainText("Ritmo de corrida");
+  await expect(page.locator(".driver-sheet-hero")).toContainText("Capacidade de ultrapassagem");
+  await expect(page.locator(".driver-sheet-hero")).toContainText("Defesa de posição");
+  await expect(page.locator(".driver-sheet-hero")).toContainText("Controle de pneus");
+  await expect(page.locator(".driver-sheet-hero")).toContainText("Consistência");
+  await expect(page.locator(".driver-sheet-hero")).toContainText("Experiência");
+  await expect(page.locator(".driver-card")).toHaveCount(43);
   await expect
     .poll(
       () =>
         page
-          .locator(".driver-card img")
+          .locator(".driver-card img, #active-driver-portrait-img")
           .evaluateAll(
             (images) =>
-              images.length === 31 &&
+              images.length >= 44 &&
               images.every((img) => img.complete && img.naturalWidth > 0),
           ),
       { timeout: 15000 },
     )
     .toBe(true);
+
+  // Test functional "Baixar imagem" button on the active 2D driver sheet
+  const downloadPromise = page.waitForEvent("download");
+  await page.locator('.driver-sheet-hero [data-action="download-driver-image"]').click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe("retrato-luan-costa-07.png");
+
+  // Test custom driver creation (2D preview, custom attributes, placeholder option)
+  await page.locator('[data-action="open-academy-creator"]').first().click();
+  await expect(page.locator("#acad-creator-3d")).toHaveCount(0);
+  await expect(page.locator("#acad-creator-portrait-img")).toBeVisible();
+  await page.locator("#acad-first-name").fill("Gabriel");
+  await page.locator("#acad-last-name").fill("Senna");
+  await page.locator("#acad-number").fill("19");
+  await page.locator("#acad-attr-speed").fill("78");
+  await page.locator('[data-action="academy-create"]').click();
+  await expect(page.locator(".academy-card")).toHaveCount(1);
+  await expect(page.locator(".academy-card")).toContainText("Gabriel Senna");
   await page.getByRole("button", { name: "Garagem", exact: true }).click();
   await page.locator("[data-action=paint-editor]").click();
   await page.locator("#paint-primary").fill("#123abc");

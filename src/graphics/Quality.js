@@ -48,14 +48,16 @@ export function applyQuality(world, value) {
   world.perfSeconds = 0;
   world.applyResolution();
   const old = world.sun.shadow.mapSize.x;
-  world.renderer.shadowMap.enabled = config.shadows > 0;
-  world.renderer.shadowMap.autoUpdate = true;
+  const activeShadows = config.shadows > 0;
+  world.renderer.shadowMap.enabled = true;
+  world.renderer.shadowMap.autoUpdate = activeShadows;
+  world.sun.shadow.autoUpdate = activeShadows;
   if (config.shadows && old !== config.shadows) {
     world.sun.shadow.dispose();
     world.sun.shadow.map = null;
     world.sun.shadow.mapSize.set(config.shadows, config.shadows);
   }
-  world.renderer.shadowMap.needsUpdate = true;
+  world.renderer.shadowMap.needsUpdate = activeShadows;
   world.dynamicShadows?.reset();
   world.camera.far =
     world.mode === "track-preview" ? 6000 : 800 + 800 * config.detail;

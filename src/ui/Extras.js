@@ -1,3 +1,7 @@
+import {
+  downloadDriverPortrait,
+  handlePortraitFileUpload,
+} from "../core/ExtraActions.js";
 import { managerPanel } from "./ManagerUI.js";
 import { trackSelector } from "./TrackSelector.js";
 import { strategyPanel } from "./RaceHUD.js";
@@ -6,7 +10,21 @@ import { estimatePitLoss, serviceEstimate } from "../strategy/PitStrategy.js";
 import { bayFor } from "../strategy/PitLayout.js";
 import { teamStandings } from "../career/TeamManager.js";
 import { icon } from "../icons.js";
-import { driverCatalog } from "../data/drivers.js";
+import {
+  driverCatalog,
+  EXCLUSIVE_SKILLS,
+  STYLE_KEYS,
+  ACADEMY_PROGRAMS,
+  NATIONALITIES,
+  ATTRIBUTE_LABELS,
+  SHEET_ATTRIBUTE_LABELS,
+  PLACEHOLDER_DRIVER_PORTRAIT,
+  nationalityFlag,
+  resolveDriverPortrait,
+  activeDriverForSave,
+  generateRandomAcademyPreset,
+  createAcademyDriver,
+} from "../data/drivers.js";
 import { trackCatalog, trackById } from "../data/tracks.js";
 import {
   vehicles,
@@ -59,7 +77,7 @@ function settingsExtra(s) {
       ["immersive", "Imersivo"],
     ],
     s.settings.hudMode,
-  )}</select></div><div class="setting-row"><b>Volante F1 Multifuncional no HUD</b><input type="checkbox" data-setting="showWheelCockpit" ${s.settings.showWheelCockpit !== false ? "checked" : ""}></div><h3>Renderização / desempenho</h3><div class="setting-row"><b>Escala de resolução</b><select data-setting="resolution" aria-label="Escala de resolução">${opt(
+  )}</select></div><h3>Renderização / desempenho</h3><div class="setting-row"><b>Escala de resolução</b><select data-setting="resolution" aria-label="Escala de resolução">${opt(
     [
       [0.5, "50%"],
       [0.65, "65%"],
@@ -168,8 +186,65 @@ function setupExtra(s, champ) {
     )}</select></label><label>PNEUS<select data-setting="tire">${opt(
       Object.entries(compounds).map(([k, t]) => [k, t.label]),
       s.settings.tire,
-    )}</select></label><div class="config-pilot"><img src="${driverCatalog[s.selectedDriver].portrait}" alt=""><span>${driverCatalog[s.selectedDriver].name}<small>${vehicles[s.selectedCar].name} · piloto titular da equipe</small></span></div></div><p class="subtle">No gerenciamento, a IA conduz seu carro titular e entra nos boxes fisicamente. Limite: 65 km/h. C: câmera · Q: rádio. Pedais somente quando você escolher direção manual.</p>`
+    )}</select></label><div class="config-pilot"><img src="${activeDriverForSave(s).portrait}" alt=""><span>${activeDriverForSave(s).name}<small>${vehicles[s.selectedCar].name} · ${activeDriverForSave(s).isAcademy ? "piloto titular promovido da base" : "piloto titular da equipe"}</small></span></div></div><p class="subtle">No gerenciamento, a IA conduz seu carro titular e entra nos boxes fisicamente. Limite: 65 km/h. C: câmera · Q: rádio. Pedais somente quando você escolher direção manual.</p>`
   );
+}
+
+function renderAcademySection(ui, s) {
+  const titular = driverCatalog[s.selectedDriver] || driverCatalog[0];
+  const academy = s.academy || [];
+  return `<div class="section-label"><span>ACADEMIA & PILOTOS PERSONALIZADOS · FORMAÇÃO (${academy.length}/8)</span><i></i><span><button class="btn primary" data-action="open-academy-creator">+ CRIAR PILOTO DA BASE</button></span></div>
+  ${
+    academy.length
+      ? `<div class="academy-grid">${academy
+          .map((a) => {
+            const isPromoted = s.promotedAcademyId === a.uid;
+            const flag = nationalityFlag(a.nationality);
+            const pInfo = resolveDriverPortrait(a, s);
+            const dSpeed = a.attributes.speed - titular.attributes.speed;
+            const dCorner = a.attributes.cornering - titular.attributes.cornering;
+            const dCons = a.attributes.consistency - titular.attributes.consistency;
+            return `<article class="panel academy-card ${isPromoted ? "promoted" : ""}" style="border-top:3px solid ${a.suitColor}">
+              <div class="academy-card-head">
+                <div class="academy-portrait-wrap">
+                  <img class="academy-portrait-2d" src="${pInfo.src}" alt="Retrato de ${a.name}" onerror="this.onerror=null;this.src='${PLACEHOLDER_DRIVER_PORTRAIT}'">
+                  ${pInfo.isPlaceholder ? '<span class="portrait-placeholder-badge">SUBSTITUTA</span>' : ""}
+                </div>
+                <div>
+                  <span class="tag">${isPromoted ? "TITULAR PROMOVIDO ATIVO" : "BASE · NÍVEL " + (a.level || 1)} · #${String(a.number).padStart(2, "0")}</span>
+                  <h3>${a.name}</h3>
+                  <small>${flag.flag} ${a.nationality} (${flag.code}) · ${a.age} anos · Equipe: <b>${a.teamName || s.team?.name || "Apex Motorsport"}</b></small>
+                  <p class="subtle" style="margin:4px 0"><b>Programa:</b> ${a.programName} · <b>Estilo:</b> ${a.styleKey} · <b>Habilidade:</b> ${a.exclusiveSkill?.name}</p>
+                </div>
+                <div class="academy-ovr-box">
+                  <small>HABILIDADE / POT</small>
+                  <b>${a.overall}<span>/${a.attributes.potential}</span></b>
+                </div>
+              </div>
+              <div class="driver-attributes academy-attrs">${SHEET_ATTRIBUTE_LABELS.map(
+                ([k, label]) =>
+                  `<span>${label} <b>${a.attributes[k] ?? a.attributes.speed}</b><i class="attr-bar"><em style="width:${a.attributes[k] ?? a.attributes.speed}%"></em></i></span>`,
+              ).join("")}</div>
+              <div class="academy-compare">
+                <small>COMPARAÇÃO VS ${titular.name.toUpperCase()} (OVR ${titular.overall}):</small>
+                <span>VEL <b>${dSpeed >= 0 ? "+" + dSpeed : dSpeed}</b></span>
+                <span>CUR <b>${dCorner >= 0 ? "+" + dCorner : dCorner}</b></span>
+                <span>CON <b>${dCons >= 0 ? "+" + dCons : dCons}</b></span>
+                <span>CORRIDAS <b>${a.races || 0} (${a.wins || 0}V)</b></span>
+              </div>
+              <div class="academy-actions">
+                <button class="btn secondary" data-action="academy-train" data-uid="${a.uid}" data-kind="pace">TREINAR RITMO · 350 CR</button>
+                <button class="btn secondary" data-action="academy-train" data-uid="${a.uid}" data-kind="racecraft">TREINAR DISPUTA · 350 CR</button>
+                <button class="btn secondary" data-action="academy-train" data-uid="${a.uid}" data-kind="consistency">SIMULADOR · 350 CR</button>
+                <button class="btn ${isPromoted ? "secondary" : "primary"}" data-action="academy-promote" data-uid="${a.uid}">${isPromoted ? "RETORNAR À RESERVA" : "PROMOVER A TITULAR"}</button>
+                <button class="btn secondary" data-action="change-driver-image" data-driver-key="${a.uid}">TROCAR RETRATO</button>
+                <button class="btn secondary" data-action="download-driver-image" data-driver-key="${a.uid}">⬇ Baixar imagem</button>
+              </div>
+            </article>`;
+          })
+          .join("")}</div>`
+      : `<div class="panel academy-empty"><p>Nenhum jovem talento inscrito no programa de formação da escuderia. Crie um piloto personalizado da base com retrato 2D, configure seus atributos e promova-o à vaga titular!</p><button class="btn primary" data-action="open-academy-creator">CRIAR PILOTO DA BASE →</button></div>`
+  }`;
 }
 
 export function extendUI(UI) {
@@ -193,18 +268,118 @@ export function extendUI(UI) {
 
   UI.prototype.drivers = function () {
     const s = this.game.save,
-      d = driverCatalog[s.selectedDriver] || driverCatalog[0],
-      stats = s.driverStats[d.id] || { races: 0, wins: 0 };
-    return `${this.title("MERCADO / " + driverCatalog.length + " IDENTIDADES", "Um piloto titular por equipe.", "10 Normais · 10 Míticos · 10 Lendários · Mega Baxter · 12 Ícones do Grid. Retratos originais estilizados.")}<div class="driver-profile panel"><img src="${d.portrait}" alt="Retrato de ${d.name}"><div><span class="tag tier-${d.tier}">${tierNames[d.tier] || d.tier} / PERFIL IA: ${(d.aiProfile || "Equilibrado").toUpperCase()}</span><h2>${d.name}</h2><p>${d.description}</p><p class="subtle"><b>Estilo de pilotagem:</b> ${d.drivingStyle || d.specialty} · <b>Equipe base:</b> ${d.teamName || "Apex Motorsport"}</p><div class="driver-profile-stats"><span>ESPECIALIDADE<b>${d.specialty}</b></span><span>CORRIDAS<b>${stats.races}</b></span><span>VITÓRIAS<b>${stats.wins}</b></span><span>OVERALL<b>${d.overall}</b></span></div><div class="driver-attributes">${Object.entries(
-      d.attributes,
-    )
-      .map(
-        ([k, v]) =>
-          `<span>${{ skill: "Habilidade", consistency: "Consistência", aggression: "Agressividade", precision: "Precisão", overtaking: "Ultrapassagem", defense: "Defesa", wetSkill: "Chuva", startSkill: "Largada", experience: "Experiência", tireManagement: "Gestão de pneus", fuelManagement: "Economia", pressure: "Pressão" }[k] || k} <b>${v}</b></span>`,
-      )
-      .join(
-        "",
-      )}</div></div><img class="helmet-profile" src="${d.helmet}" alt="Capacete exclusivo"></div><div class="section-label"><span>CATÁLOGO DE PILOTOS (1 PILOTO TITULAR POR EQUIPE)</span><i></i><span>${s.unlockedDrivers.length}/${driverCatalog.length} CONTRATADOS</span></div><div class="driver-grid">${driverCatalog.map((d) => `<article class="driver-card panel tier-${d.tier}"><div class="driver-card-top"><span>${tierNames[d.tier] || d.tier} · ${d.aiProfile || "Equilibrado"}</span><b>${d.overall}</b></div><img src="${d.portrait}" alt="Retrato de ${d.name}" loading="lazy"><div class="driver-card-info"><small>#${String(d.number).padStart(2, "0")} / ${d.personality}</small><h3>${d.name}</h3><p>${d.specialty}</p><button class="btn ${s.selectedDriver === d.id ? "primary" : "secondary"}" data-action="pilot" data-id="${d.id}" ${s.selectedDriver === d.id ? "disabled" : ""}>${s.selectedDriver === d.id ? "TITULAR ATIVO" : s.unlockedDrivers.includes(d.id) ? "DEFINIR TITULAR" : d.id === 30 ? "VENÇA BAXTER" : fmt(d.cost) + " CR"}</button></div></article>`).join("")}</div>`;
+      d = activeDriverForSave(s),
+      stats = d.isAcademy
+        ? { races: d.races || 0, wins: d.wins || 0 }
+        : s.driverStats[d.id] || { races: 0, wins: 0 },
+      skill = d.exclusiveSkill || EXCLUSIVE_SKILLS[0],
+      flag = nationalityFlag(d.nationality),
+      pInfo = resolveDriverPortrait(d, s),
+      currentTeam = d.isAcademy
+        ? s.team?.name || d.teamName || "Apex Motorsport"
+        : d.id === s.selectedDriver
+          ? s.team?.name || d.teamName || "Apex Motorsport"
+          : d.teamName || "Apex Motorsport";
+    return `${this.title("MERCADO & ACADEMIA / " + driverCatalog.length + " FICHAS OFICIAIS + BASE", "Fichas técnicas 2D · Atributos reais de corrida, estilo de pilotagem e Academia da Base.", "10 Normais · 10 Míticos · 10 Lendários · Mega Baxter · 12 Ícones do Grid + Criação de Piloto Personalizado.")}
+    <input id="driver-portrait-upload-input" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden>
+    <section class="driver-profile panel driver-sheet-hero" style="border-top:4px solid ${d.suitColor || d.color || "#e63956"}">
+      <div class="driver-sheet-portrait-col">
+        <div class="driver-portrait-frame">
+          <span class="driver-number-pill" style="background:${d.suitColor || d.color || "#e63956"}">#${String(d.number).padStart(2, "0")}</span>
+          <span class="driver-flag-pill" title="${d.nationality}">${flag.flag} ${flag.code}</span>
+          <img id="active-driver-portrait-img" src="${pInfo.src}" alt="Retrato de ${d.name}" onerror="this.onerror=null;this.src='${PLACEHOLDER_DRIVER_PORTRAIT}'">
+          <img class="driver-sheet-helmet" src="${d.helmet}" alt="Capacete de ${d.name}" onerror="this.style.display='none'">
+          ${pInfo.isPlaceholder ? '<span class="portrait-placeholder-tag">IMAGEM SUBSTITUTA · SEM FOTO OFICIAL</span>' : pInfo.isCustom ? '<span class="portrait-custom-tag">RETRATO PERSONALIZADO</span>' : ""}
+        </div>
+        <div class="driver-portrait-actions">
+          <button class="btn primary" data-action="download-driver-image" data-driver-key="${d.uid || d.id}">⬇ Baixar imagem</button>
+          <button class="btn secondary" data-action="change-driver-image" data-driver-key="${d.uid || d.id}">Trocar retrato</button>
+        </div>
+      </div>
+      <div class="driver-sheet-details-col">
+        <div class="driver-sheet-header-row">
+          <div>
+            <span class="tag tier-${d.tier}">${d.isAcademy ? "PILOTO PERSONALIZADO · TITULAR" : (tierNames[d.tier] || d.tier)} · ESTILO: ${(d.styleKey || d.aiProfile || "Equilibrado").toUpperCase()}</span>
+            <h2>${d.name} <small>#${String(d.number).padStart(2, "0")}</small></h2>
+            <div class="driver-meta-pills">
+              <span><b>Nacionalidade:</b> ${flag.flag} ${d.nationality || "Internacional"}</span>
+              <span><b>Equipe atual:</b> <i class="team-dot" style="background:${d.suitColor || d.color || "#e63956"}"></i>${currentTeam}</span>
+              <span><b>Idade:</b> ${d.age || 24} anos</span>
+              <span><b>Personalidade:</b> ${d.personality || d.styleKey || "Competitivo"}</span>
+            </div>
+          </div>
+          <div class="driver-ovr-badge">
+            <small>HABILIDADE GERAL</small>
+            <strong>${d.overall}</strong>
+            <span>POT ${d.attributes.potential}</span>
+          </div>
+        </div>
+        <p class="driver-bio-text">${d.description}</p>
+        <div class="driver-skill-banner">
+          <div>
+            <small>HABILIDADE EXCLUSIVA · ${skill.name.toUpperCase()}</small>
+            <b>${skill.bonusLabel}</b>
+            <span>Limite: ${skill.limitation}</span>
+          </div>
+          <div>
+            <small>ESTILO DE PILOTAGEM & PERSONALIDADE</small>
+            <b>${d.styleKey || "Consistente"} · ${d.personality || "Calculista"}</b>
+            <span>${d.drivingStyle}</span>
+          </div>
+        </div>
+        <div class="driver-profile-stats">
+          <span>EQUIPE ATUAL<b>${currentTeam}</b></span>
+          <span>ESPECIALIDADE<b>${d.specialty}</b></span>
+          <span>CORRIDAS / VITÓRIAS<b>${stats.races} / ${stats.wins}</b></span>
+          <span>HABILIDADE / POTENCIAL<b>${d.overall} / ${d.attributes.potential}</b></span>
+        </div>
+        <div class="driver-attributes">${SHEET_ATTRIBUTE_LABELS.map(
+          ([k, label]) =>
+            `<span>${label} <b>${d.attributes[k] ?? d.attributes.speed}</b><i class="attr-bar"><em style="width:${d.attributes[k] ?? d.attributes.speed}%"></em></i></span>`,
+        ).join("")}</div>
+      </div>
+    </section>
+    ${renderAcademySection(this, s)}
+    <div class="section-label"><span>FICHAS DE PILOTOS DO CAMPEONATO (${driverCatalog.length} PILOTOS)</span><i></i><span>${s.unlockedDrivers.length}/${driverCatalog.length} CONTRATADOS</span></div>
+    <div class="driver-grid">${driverCatalog.map((cDriver) => {
+      const isActiveTitular = !s.promotedAcademyId && s.selectedDriver === cDriver.id;
+      const cFlag = nationalityFlag(cDriver.nationality);
+      const cPort = resolveDriverPortrait(cDriver, s);
+      const cTeam =
+        cDriver.id === s.selectedDriver
+          ? s.team?.name || cDriver.teamName || "Apex Motorsport"
+          : cDriver.teamName || "Escuderia Independente";
+      return `<article class="driver-card driver-sheet-card panel tier-${cDriver.tier}" style="border-top:3px solid ${cDriver.suitColor || cDriver.color}">
+        <div class="driver-card-top">
+          <span>${cFlag.flag} ${cDriver.nationality} · ${cDriver.age} anos</span>
+          <b>OVR ${cDriver.overall}</b>
+        </div>
+        <div class="driver-card-media">
+          <img src="${cPort.src}" alt="Retrato de ${cDriver.name}" onerror="this.onerror=null;this.src='${PLACEHOLDER_DRIVER_PORTRAIT}'">
+          <span class="driver-card-num" style="background:${cDriver.suitColor || cDriver.color}">#${String(cDriver.number).padStart(2, "0")}</span>
+          <img class="driver-card-helmet" src="${cDriver.helmet}" alt="" onerror="this.style.display='none'">
+        </div>
+        <div class="driver-card-info">
+          <small class="driver-card-team"><i class="team-dot" style="background:${cDriver.suitColor || cDriver.color}"></i>${cTeam} · ${tierNames[cDriver.tier] || cDriver.tier}</small>
+          <h3>${cDriver.name}</h3>
+          <p class="driver-card-style"><b>${cDriver.styleKey || cDriver.aiProfile}</b> · ${cDriver.exclusiveSkill?.name || cDriver.specialty}</p>
+          <div class="driver-card-mini-stats">
+            <span title="Ritmo de classificação">CLAS <b>${cDriver.attributes.qualifyingPace}</b></span>
+            <span title="Ritmo de corrida">CORR <b>${cDriver.attributes.racePace}</b></span>
+            <span title="Capacidade de ultrapassagem">ULT <b>${cDriver.attributes.overtaking}</b></span>
+            <span title="Defesa de posição">DEF <b>${cDriver.attributes.defense}</b></span>
+            <span title="Controle de pneus">PNEU <b>${cDriver.attributes.tireControl}</b></span>
+            <span title="Consistência">CON <b>${cDriver.attributes.consistency}</b></span>
+            <span title="Experiência">EXP <b>${cDriver.attributes.experience}</b></span>
+            <span title="Potencial">POT <b>${cDriver.attributes.potential}</b></span>
+          </div>
+          <div class="driver-card-actions">
+            <button class="btn ${isActiveTitular ? "primary" : "secondary"}" data-action="pilot" data-id="${cDriver.id}" ${isActiveTitular ? "disabled" : ""}>${isActiveTitular ? "TITULAR ATIVO" : s.unlockedDrivers.includes(cDriver.id) ? "SELECIONAR" : cDriver.id === 30 ? "VENÇA BAXTER" : fmt(cDriver.cost) + " CR"}</button>
+            <button class="btn secondary btn-download-mini" data-action="download-driver-image" data-driver-key="${cDriver.id}" title="Baixar retrato de ${cDriver.name}">⬇ Baixar imagem</button>
+          </div>
+        </div>
+      </article>`;
+    }).join("")}</div>`;
   };
 
   UI.prototype.operations = function () {
@@ -212,8 +387,10 @@ export function extendUI(UI) {
       level = 1 + Math.floor(s.xp / 1000),
       principal = teamPrincipalById(s.teamPrincipal ?? 0),
       primarySponsor = sponsorById(s.sponsors?.primary || "aether_ai"),
-      secondarySponsor = sponsorById(s.sponsors?.secondary || "pirex_tires");
-    return `${this.title("CARREIRA / OPERAÇÕES DE EQUIPE", "Lidere sua escuderia rumo ao título.", "Reputação, chefe de equipe, patrocinadores, identidade visual e histórico de corridas.")}<div class="ops-grid"><article class="panel ops-card"><div class="eyebrow">REPUTAÇÃO · NÍVEL ${level}</div><h2>${fmt(s.xp)} XP</h2><div class="performance-bar"><span style="width:${(s.xp % 1000) / 10}%"></span></div><p>${1000 - (s.xp % 1000)} XP para o próximo nível. Piloto titular ativo: <b>${driverCatalog[s.selectedDriver].name}</b> (1 piloto por equipe).</p>${b("PREPARAR CORRIDA", "setup")}</article><article class="panel ops-card"><div class="eyebrow">${s.team.name.toUpperCase()} · ENGENHARIA</div><h2>Desenvolvimento ${s.team.development}/5</h2><p>Melhora o controle do carro titular, reduz até 1,2 s de troca nos boxes e torna a equipe mais consistente. Custo: ${fmt(1200 + s.team.development * 700)} CR.</p>${b("INVESTIR NA ENGENHARIA", "team-upgrade", s.team.development >= 5 ? "disabled" : "")}<p>Boxes da equipe: ${s.team.pitStats.stops} serviços · melhor ${s.team.pitStats.bestService?.toFixed(2) || "—"} s · ${s.team.pitStats.laneSeconds.toFixed(1)} s em passagem.</p><p>Chefe de Equipe: <b>${principal.name}</b> (${principal.specialty})</p><label>ALTERAR CHEFE DE EQUIPE<select data-action-select="team-principal">${teamPrincipals.map((tp) => `<option value="${tp.id}" ${tp.id === principal.id ? "selected" : ""}>${tp.name} — ${tp.role}</option>`).join("")}</select></label></article><article class="panel ops-card baxter-card"><span class="infinity">∞</span><div class="eyebrow">O ÚLTIMO DESAFIO</div><h2>Mega Baxter</h2><p>${s.baxterWon ? "Você venceu o impossível. Baxter e B-0 estão na sua coleção." : "Complete um campeonato. Depois enfrente Baxter em seu evento de elite para desbloquear o piloto supremo e o B-0."}</p>${b("DESAFIAR BAXTER", "mega-event", !s.stats.seasons && !this.game.admin.active ? "disabled" : "")}</article></div>
+      secondarySponsor = sponsorById(s.sponsors?.secondary || "pirex_tires"),
+      activePilot = activeDriverForSave(s);
+    return `${this.title("CARREIRA / OPERAÇÕES DE EQUIPE", "Lidere sua escuderia rumo ao título.", "Reputação, chefe de equipe, Academia de Pilotos da Base, patrocinadores e histórico.")}<div class="ops-grid"><article class="panel ops-card"><div class="eyebrow">REPUTAÇÃO · NÍVEL ${level}</div><h2>${fmt(s.xp)} XP</h2><div class="performance-bar"><span style="width:${(s.xp % 1000) / 10}%"></span></div><p>${1000 - (s.xp % 1000)} XP para o próximo nível. Piloto titular ativo: <b>${activePilot.name}</b> (${activePilot.isAcademy ? "Promovido da Base · OVR " + activePilot.overall : "Titular · OVR " + activePilot.overall}).</p><div style="display:flex;gap:8px;flex-wrap:wrap">${b("PREPARAR CORRIDA", "setup")}${b("CRIAR PILOTO DA BASE", "open-academy-creator")}</div></article><article class="panel ops-card"><div class="eyebrow">${s.team.name.toUpperCase()} · ENGENHARIA</div><h2>Desenvolvimento ${s.team.development}/5</h2><p>Melhora o controle do carro titular, reduz até 1,2 s de troca nos boxes e torna a equipe mais consistente. Custo: ${fmt(1200 + s.team.development * 700)} CR.</p>${b("INVESTIR NA ENGENHARIA", "team-upgrade", s.team.development >= 5 ? "disabled" : "")}<p>Boxes da equipe: ${s.team.pitStats.stops} serviços · melhor ${s.team.pitStats.bestService?.toFixed(2) || "—"} s · ${s.team.pitStats.laneSeconds.toFixed(1)} s em passagem.</p><p>Chefe de Equipe: <b>${principal.name}</b> (${principal.specialty})</p><label>ALTERAR CHEFE DE EQUIPE<select data-action-select="team-principal">${teamPrincipals.map((tp) => `<option value="${tp.id}" ${tp.id === principal.id ? "selected" : ""}>${tp.name} — ${tp.role}</option>`).join("")}</select></label></article><article class="panel ops-card baxter-card"><span class="infinity">∞</span><div class="eyebrow">O ÚLTIMO DESAFIO</div><h2>Mega Baxter</h2><p>${s.baxterWon ? "Você venceu o impossível. Baxter e B-0 estão na sua coleção." : "Complete um campeonato. Depois enfrente Baxter em seu evento de elite para desbloquear o piloto supremo e o B-0."}</p>${b("DESAFIAR BAXTER", "mega-event", !s.stats.seasons && !this.game.admin.active ? "disabled" : "")}</article></div>
+    ${renderAcademySection(this, s)}
     <div class="section-label"><span>PATROCINADORES OFICIAIS (10 SETORES)</span><i></i><span>${s.sponsors?.goalsCompleted || 0} METAS CUMPRIDAS · +${fmt(s.sponsors?.totalEarned || 0)} CR</span></div>
     <div class="ops-grid">
       <article class="panel ops-card" style="border-top:3px solid ${primarySponsor.primaryColor}">
@@ -394,6 +571,12 @@ export function extendUI(UI) {
 
   const render = UI.prototype.render;
   UI.prototype.render = function () {
+    if (this.game && !this.game.handlePortraitFileUpload) {
+      this.game.handlePortraitFileUpload = (file, targetKey, cb) =>
+        handlePortraitFileUpload(this.game, file, targetKey, cb);
+      this.game.downloadDriverPortrait = (key) =>
+        downloadDriverPortrait(this.game, key);
+    }
     render.call(this);
     const select = document.getElementById("compare-car");
     if (select)
@@ -401,13 +584,68 @@ export function extendUI(UI) {
         this.compareCar = Number(select.value);
         this.render();
       };
+    const uploadInput = document.getElementById("driver-portrait-upload-input");
+    if (uploadInput && !uploadInput.dataset.bound) {
+      uploadInput.dataset.bound = "1";
+      uploadInput.addEventListener("change", (ev) => {
+        const file = ev.target.files?.[0];
+        if (!file) return;
+        this.game.handlePortraitFileUpload(
+          file,
+          this.pendingPortraitTargetKey || null,
+        );
+        ev.target.value = "";
+      });
+    }
   };
 
   const show = UI.prototype.showModal;
   UI.prototype.showModal = function (type) {
     const s = this.game.save;
     let html = "";
-    if (type === "paint-editor") {
+    if (type === "academy-creator") {
+      const preset =
+        this.academyDraft ||
+        (this.academyDraft = generateRandomAcademyPreset(
+          (s.academy?.length || 0) * 97 + 17,
+        ));
+      const previewDoc = createAcademyDriver(preset, s.academy || []);
+      const pInfo = resolveDriverPortrait(previewDoc, s);
+      const teamOptions = [
+        s.team?.name || "Apex Motorsport",
+        "Academia Apex Motorsport",
+        "Vortex Racing",
+        "Scuderia Veloce",
+        "Chronos Racing",
+        "Aether GP",
+        "Titan Motorsport",
+      ];
+      html = `<div class="modal-eyebrow">ACADEMIA DE PILOTOS / CRIAR PILOTO PERSONALIZADO</div><h2>Inscrever Novo Talento na Equipe</h2><p>Configure identidade, equipe, retrato 2D (do seu dispositivo ou do catálogo), habilidades individuais e estilo de pilotagem.</p><div class="academy-creator-layout"><div class="academy-creator-preview"><div class="academy-creator-2d-frame"><img id="acad-creator-portrait-img" src="${pInfo.src}" alt="Prévia 2D do piloto" onerror="this.onerror=null;this.src='${PLACEHOLDER_DRIVER_PORTRAIT}'"><span id="acad-creator-num-badge" class="driver-card-num" style="background:${previewDoc.suitColor}">#${String(previewDoc.number).padStart(2, "0")}</span></div><div class="academy-creator-summary"><b>OVR INICIAL ${previewDoc.overall} · POTENCIAL ${previewDoc.attributes.potential}</b><small>${previewDoc.programName}</small></div><label class="btn secondary file-upload-label" style="width:100%;text-align:center;box-sizing:border-box;cursor:pointer">📁 ENVIAR FOTO DO DISPOSITIVO<input id="acad-portrait-file" type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden></label><small id="acad-portrait-status" class="subtle" style="font-size:10px;text-align:center">${preset.customPortrait ? "Imagem personalizada carregada" : preset.usePlaceholder ? "Usando imagem substituta" : "Usando retrato local #" + ((preset.portraitIndex ?? 0) + 1)}</small></div><div class="paint-editor academy-form"><label>NOME<input id="acad-first-name" type="text" maxlength="18" value="${preset.firstName}"></label><label>SOBRENOME<input id="acad-last-name" type="text" maxlength="18" value="${preset.lastName}"></label><label>NACIONALIDADE<select id="acad-nationality">${opt(
+        NATIONALITIES.map((n) => [n, `${nationalityFlag(n).flag} ${n}`]),
+        preset.nationality,
+      )}</select></label><label>IDADE INICIAL (16–23)<input id="acad-age" type="number" min="16" max="23" value="${preset.age}"></label><label>NÚMERO DO CARRO<input id="acad-number" type="number" min="2" max="99" value="${preset.number}"></label><label>EQUIPE ATUAL<select id="acad-team">${opt(
+        [...new Set(teamOptions)].map((t) => [t, t]),
+        preset.teamName || s.team?.name || "Apex Motorsport",
+      )}</select></label><label>PROGRAMA DE FORMAÇÃO<select id="acad-program">${opt(
+        ACADEMY_PROGRAMS.map((p) => [p.id, p.name]),
+        preset.program,
+      )}</select></label><label>ESTILO DE PILOTAGEM<select id="acad-style">${opt(
+        STYLE_KEYS.map((k) => [k, k]),
+        preset.styleKey,
+      )}</select></label><label>HABILIDADE EXCLUSIVA<select id="acad-skill">${opt(
+        EXCLUSIVE_SKILLS.map((sk) => [sk.id, sk.name]),
+        preset.skillId,
+      )}</select></label><label>RETRATO PADRÃO / SUBSTITUTO<select id="acad-portrait-select">${opt(
+        [
+          ...Array.from({ length: 10 }, (_, i) => [
+            String(i),
+            `Retrato Oficial 0${i + 1}`,
+          ]),
+          ["placeholder", "Sem foto (Imagem substituta)"],
+        ],
+        preset.usePlaceholder ? "placeholder" : String(preset.portraitIndex ?? 0),
+      )}</select></label><label>RITMO DE CLASSIFICAÇÃO (45–85)<input id="acad-attr-speed" type="number" min="45" max="85" value="${previewDoc.attributes.speed}"></label><label>RITMO DE CORRIDA (45–85)<input id="acad-attr-racecraft" type="number" min="45" max="85" value="${previewDoc.attributes.racecraft}"></label><label>ULTRAPASSAGEM (45–85)<input id="acad-attr-overtaking" type="number" min="45" max="85" value="${previewDoc.attributes.overtaking}"></label><label>DEFESA DE POSIÇÃO (45–85)<input id="acad-attr-defense" type="number" min="45" max="85" value="${previewDoc.attributes.defense}"></label><label>CONTROLE DE PNEUS (45–85)<input id="acad-attr-tire" type="number" min="45" max="85" value="${previewDoc.attributes.tireControl}"></label><label>CONSISTÊNCIA (45–85)<input id="acad-attr-consistency" type="number" min="45" max="85" value="${previewDoc.attributes.consistency}"></label><label>COR DO MACACÃO / EQUIPE<input id="acad-suit-color" type="color" value="${preset.suitColor}"></label><label>COR DO CAPACETE<input id="acad-helmet-color" type="color" value="${preset.helmetColor}"></label></div></div><div class="setting-actions">${b("GERAR TALENTO ALEATÓRIO", "academy-randomize")}${b("CRIAR E INTEGRAR À BASE", "academy-create")}</div>`;
+    } else if (type === "paint-editor") {
       const l = liveries[s.selectedCar],
         p = s.customizations[s.selectedCar] || {
           primary: l.color,
@@ -461,6 +699,77 @@ export function extendUI(UI) {
       node.className = "modal-backdrop";
       node.innerHTML = `<section class="modal" role="dialog" aria-modal="true" aria-label="${type}"><button class="icon-btn modal-close" data-action="close" aria-label="Fechar">${icon("close")}</button>${html}</section>`;
       this.root.appendChild(node);
+      if (type === "academy-creator") {
+        const updateCreatorPreview = () => {
+          const portraitSel = document.getElementById("acad-portrait-select")?.value;
+          const usePlaceholder = portraitSel === "placeholder";
+          const portraitIndex = usePlaceholder ? 0 : Number(portraitSel) || 0;
+          const draft = {
+            ...this.academyDraft,
+            firstName: document.getElementById("acad-first-name")?.value,
+            lastName: document.getElementById("acad-last-name")?.value,
+            nationality: document.getElementById("acad-nationality")?.value,
+            age: Number(document.getElementById("acad-age")?.value),
+            number: Number(document.getElementById("acad-number")?.value),
+            teamName: document.getElementById("acad-team")?.value,
+            program: document.getElementById("acad-program")?.value,
+            styleKey: document.getElementById("acad-style")?.value,
+            skillId: document.getElementById("acad-skill")?.value,
+            suitColor: document.getElementById("acad-suit-color")?.value,
+            helmetColor: document.getElementById("acad-helmet-color")?.value,
+            portraitIndex,
+            usePlaceholder,
+            customAttributes: {
+              speed: Number(document.getElementById("acad-attr-speed")?.value),
+              racecraft: Number(document.getElementById("acad-attr-racecraft")?.value),
+              overtaking: Number(document.getElementById("acad-attr-overtaking")?.value),
+              defense: Number(document.getElementById("acad-attr-defense")?.value),
+              tireControl: Number(document.getElementById("acad-attr-tire")?.value),
+              consistency: Number(document.getElementById("acad-attr-consistency")?.value),
+            },
+          };
+          this.academyDraft = draft;
+          const doc = createAcademyDriver(draft, s.academy || []);
+          const imgEl = document.getElementById("acad-creator-portrait-img");
+          if (imgEl) imgEl.src = doc.portrait;
+          const numEl = document.getElementById("acad-creator-num-badge");
+          if (numEl) {
+            numEl.textContent = "#" + String(doc.number).padStart(2, "0");
+            numEl.style.background = doc.suitColor;
+          }
+          const statusEl = document.getElementById("acad-portrait-status");
+          if (statusEl) {
+            statusEl.textContent = draft.customPortrait
+              ? "Imagem personalizada carregada"
+              : draft.usePlaceholder
+                ? "Usando imagem substituta"
+                : "Usando retrato oficial #" + (portraitIndex + 1);
+          }
+          const sum = node.querySelector(".academy-creator-summary");
+          if (sum) {
+            sum.innerHTML = `<b>OVR INICIAL ${doc.overall} · POTENCIAL ${doc.attributes.potential}</b><small>${doc.programName}</small>`;
+          }
+        };
+        updateCreatorPreview();
+        node
+          .querySelectorAll("input:not([type='file']), select")
+          .forEach((el) => el.addEventListener("input", updateCreatorPreview));
+        const fileIn = document.getElementById("acad-portrait-file");
+        if (fileIn) {
+          fileIn.addEventListener("change", (ev) => {
+            const file = ev.target.files?.[0];
+            if (!file) return;
+            this.game.handlePortraitFileUpload(file, "__academy_draft__", (dataUrl) => {
+              this.academyDraft = {
+                ...(this.academyDraft || {}),
+                customPortrait: dataUrl,
+                usePlaceholder: false,
+              };
+              updateCreatorPreview();
+            });
+          });
+        }
+      }
       return;
     }
     show.call(this, type);

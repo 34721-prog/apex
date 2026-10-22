@@ -356,10 +356,6 @@ export class Game {
       ];
       this.save.settings.raceDistancePreset = match || "custom";
     }
-    if (key === "showWheelCockpit") {
-      const wheel = document.getElementById("f1-wheel-cockpit");
-      if (wheel) wheel.classList.toggle("show", !!value);
-    }
     if (key === "hudMode") {
       const root = document.getElementById("race-hud");
       if (root) root.dataset.mode = value;

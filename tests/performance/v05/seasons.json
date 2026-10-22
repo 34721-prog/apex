@@ -1,15 +1,15 @@
 [
   {
     "id": "world",
-    "sessions": 18,
-    "races": 6,
+    "sessions": 24,
+    "races": 8,
     "points": [
-      113,
-      105,
-      104,
-      85,
-      66,
-      61
+      164,
+      158,
+      120,
+      99,
+      97,
+      74
     ],
     "finishers": [
       6,
@@ -17,19 +17,21 @@
       6,
       6,
       6,
+      6,
+      6,
       6
     ],
-    "decisions": 1
+    "decisions": 2
   },
   {
     "id": "sprint",
     "sessions": 6,
     "races": 3,
     "points": [
-      24,
-      19,
-      16,
-      15,
+      22,
+      21,
+      18,
+      13,
       13,
       12
     ],
@@ -42,17 +44,18 @@
   },
   {
     "id": "junior",
-    "sessions": 9,
-    "races": 3,
+    "sessions": 12,
+    "races": 4,
     "points": [
-      40,
+      57,
+      51,
       36,
-      33,
-      20,
-      18,
-      18
+      26,
+      26,
+      24
     ],
     "finishers": [
+      6,
       6,
       6,
       6
@@ -61,34 +64,15 @@
   },
   {
     "id": "endurance",
-    "sessions": 6,
-    "races": 3,
-    "points": [
-      74,
-      68,
-      63,
-      52,
-      40,
-      36
-    ],
-    "finishers": [
-      6,
-      6,
-      6
-    ],
-    "decisions": 2
-  },
-  {
-    "id": "one-make",
     "sessions": 8,
     "races": 4,
     "points": [
-      73,
-      61,
-      51,
-      39,
-      38,
-      30
+      108,
+      98,
+      80,
+      56,
+      52,
+      48
     ],
     "finishers": [
       6,
@@ -96,19 +80,41 @@
       6,
       6
     ],
-    "decisions": 0
+    "decisions": 1
+  },
+  {
+    "id": "one-make",
+    "sessions": 12,
+    "races": 6,
+    "points": [
+      100,
+      93,
+      92,
+      60,
+      55,
+      38
+    ],
+    "finishers": [
+      6,
+      6,
+      6,
+      6,
+      6,
+      6
+    ],
+    "decisions": 1
   },
   {
     "id": "legends",
     "sessions": 6,
     "races": 3,
     "points": [
-      52,
-      38,
-      33,
+      49,
+      35,
+      27,
       18,
-      7,
-      5
+      16,
+      8
     ],
     "finishers": [
       6,

@@ -171,6 +171,8 @@ export class RaceControl {
     if (this.clock - (this.pairs.get(key) ?? -100) < 2) return;
     this.pairs.set(key, this.clock);
     a.ruleState.lastContact = b.ruleState.lastContact = this.clock;
+    a.ruleState.peakImpact = Math.max(a.ruleState.peakImpact || 0, closing);
+    b.ruleState.peakImpact = Math.max(b.ruleState.peakImpact || 0, closing);
     this.race.emit("contact", a.id, {
       other: b.id,
       closing: Number(closing.toFixed(2)),
@@ -281,6 +283,10 @@ export class RaceControl {
     }
     if (this.phase === "sc") {
       this.sc.update(dt, r);
+      r.neutralization = Math.max(
+        1,
+        this.sc.state === "train" ? Math.max(2, 18 - this.sc.elapsed) : 12,
+      );
       if (
         this.sc.state === "return" &&
         this.sc.car.lateral > 14 &&
@@ -306,19 +312,74 @@ export class RaceControl {
       }
       this.restartS = s;
     }
-    if (
+    const canDeployNeutralization =
       r.time > 8 &&
-      r.realism === "realistic" &&
-      this.clock - this.lastIncident > 40
-    ) {
-      const hit = r.cars.find((c) => c.impact > 25 && !c.finished);
+      r.sessionType !== "qualifying" &&
+      r.cars.length > 1 &&
+      !["time-trial", "practice"].includes(r.mode);
+    if (canDeployNeutralization) {
+      const hit = r.cars.find(
+        (c) =>
+          !c.finished &&
+          Math.max(c.impact || 0, c.ruleState?.peakImpact || 0) > 25,
+      );
       if (hit) {
+        const impactVal = Math.max(
+          hit.impact || 0,
+          hit.ruleState?.peakImpact || 0,
+        );
+        if (hit.ruleState) hit.ruleState.peakImpact = 0;
+        const severeForSc =
+          impactVal > 38 ||
+          (impactVal > 28 && (hit.damage >= 0.55 || hit.retired));
+        if (
+          severeForSc &&
+          this.phase !== "sc" &&
+          this.phase !== "red" &&
+          this.clock - (this.lastScIncident || -100) > 40
+        ) {
+          this.lastScIncident = this.clock;
+          this.lastIncident = this.clock;
+          this.neutralize(
+            "sc",
+            "Incidente: impacto medido de " + impactVal.toFixed(1),
+            18,
+            sector(hit.s),
+          );
+        } else if (
+          !severeForSc &&
+          this.phase === "green" &&
+          this.clock - this.lastIncident > 40
+        ) {
+          this.lastIncident = this.clock;
+          this.neutralize(
+            "vsc",
+            "Incidente: impacto medido de " + impactVal.toFixed(1),
+            16,
+            sector(hit.s),
+          );
+        }
+      }
+      const retiredObstruction = r.cars.find(
+        (c) =>
+          !c.finished &&
+          c.retired &&
+          c.pit.state === "track" &&
+          c.speed < 8,
+      );
+      if (
+        retiredObstruction &&
+        this.phase !== "sc" &&
+        this.phase !== "red" &&
+        this.clock - (this.lastScIncident || -100) > 40
+      ) {
+        this.lastScIncident = this.clock;
         this.lastIncident = this.clock;
         this.neutralize(
-          hit.impact > 52 ? "sc" : "vsc",
-          "Incidente: impacto medido de " + hit.impact.toFixed(1),
-          16,
-          sector(hit.s),
+          "sc",
+          `Carro imobilizado na pista: #${retiredObstruction.number} ${retiredObstruction.name}`,
+          18,
+          sector(retiredObstruction.s),
         );
       }
     }
@@ -683,13 +744,32 @@ export class RaceControl {
         Math.abs(c.lateral) < TRACK_WIDTH / 2 &&
         c.pit.state === "track",
     );
-    if (obstruction && r.realism === "realistic") {
+    if (obstruction) {
       const i = sector(obstruction.s) - 1;
       this.sectors[i] = {
         type: "double-yellow",
         until: this.clock + 4,
         reason: "Carro imobilizado na pista",
       };
+      if (
+        !obstruction.scCleared &&
+        this.phase !== "sc" &&
+        this.phase !== "red" &&
+        r.sessionType !== "qualifying" &&
+        r.cars.length > 1 &&
+        r.time > 10 &&
+        this.clock - (this.lastScIncident || -100) > 40
+      ) {
+        obstruction.scCleared = true;
+        this.lastScIncident = this.clock;
+        this.lastIncident = this.clock;
+        this.neutralize(
+          "sc",
+          "Safety Car: carro #" + obstruction.number + " imobilizado na pista",
+          18,
+          i + 1,
+        );
+      }
     }
   }
   gridCheck() {

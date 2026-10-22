@@ -1,0 +1,178 @@
+{
+  "config": {
+    "argv": [
+      "/usr/bin/node",
+      "/home/user/apex/node_modules/.bin/playwright",
+      "test",
+      "tests/environment.spec.js",
+      "--workers=1"
+    ],
+    "configFile": "/home/user/apex/playwright.config.js",
+    "rootDir": "/home/user/apex/tests",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/user/apex/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "/home/user/apex/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.spec.js"
+        ],
+        "timeout": 180000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "/home/user/apex/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "",
+        "testDir": "/home/user/apex/tests",
+        "snapshotDir": "/home/user/apex/tests",
+        "testIgnore": [],
+        "testMatch": "**/*.spec.js",
+        "timeout": 180000,
+        "use": {
+          "baseURL": "http://localhost:5173",
+          "viewport": {
+            "width": 1440,
+            "height": 960
+          },
+          "headless": true,
+          "launchOptions": {
+            "args": [
+              "--no-sandbox",
+              "--enable-unsafe-swiftshader"
+            ]
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": ""
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "tests/browser-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.1",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "environment.spec.js",
+      "file": "environment.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "environment production: 14 tracks, unchanged population, reversible LOD and camera clipping",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 240000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "timedOut",
+                  "duration": 240260,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 240000ms exceeded.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 240000ms exceeded.\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "message": "\u001b[31mTest timeout of 240000ms exceeded.\u001b[39m"
+                    },
+                    {
+                      "location": {
+                        "file": "/home/user/apex/tests/environment.spec.js",
+                        "column": 27,
+                        "line": 8
+                      },
+                      "message": "Error: page.evaluate: Test timeout of 240000ms exceeded.\n\n   6 |  await page.evaluate(async()=>{__game.frame=()=>{};await new Promise(requestAnimationFrame);Object.assign(__game.save.settings,{bots:5,controlMode:'manager',audio:false});});\n   7 |  for(const t of trackCatalog){\n>  8 |   const result=await page.evaluate(async id=>{const g=__game;g.race=null;await g.loadTrack(id,{page:true});g.save.settings.track=id;g.start();g.race.state='racing';const w=g.world,e=w.environment;\n     |                           ^\n   9 |    const original=JSON.stringify(g.race.cars),population=w.venues.plan.reduce((s,v)=>s+v.spectators,0),rows=[];\n  10 |    for(const quality of ['low','medium','high']){\n  11 |     w.quality(quality);\n    at /home/user/apex/tests/environment.spec.js:8:27"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-22T16:02:06.432Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/user/apex/test-results/environment-environment-pr-b43cd-ble-LOD-and-camera-clipping/error-context.md"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "bdea788f2f9f43ee7e32-b21086557e725c412dbd",
+          "file": "environment.spec.js",
+          "line": 3,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-22T16:02:05.708Z",
+    "duration": 241211.537,
+    "expected": 0,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

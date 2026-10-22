@@ -33,6 +33,6 @@ for(const t of trackCatalog)test('environment safe deterministic composition: '+
  const geometries=new Set([ground.geometry]),materials=new Set([ground.material]);scene.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)materials.add(o.material);});geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());
 });
 test('every circuit has its own environment identity; view output is reusable',()=>{
- assert.equal(new Set(trackCatalog.map(t=>environmentProfile(t.id).identity)).size,14);
+ assert.equal(new Set(trackCatalog.map(t=>environmentProfile(t.id).identity)).size,trackCatalog.length);
  const out={};assert.equal(environmentView(1000,1300,1400,out),out);assert.ok(out.far>2700);assert.ok(out.fogFar>out.fogNear);
 });

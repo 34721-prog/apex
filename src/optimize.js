@@ -42,6 +42,8 @@ export function batchScenery(scene, exclude = []) {
     const key =
       o.material.uuid +
       "-" +
+      (o.castShadow ? "cast" : "nocast") +
+      "-" +
       Object.keys(o.geometry.attributes).sort().join("-");
     if (!buckets.has(key)) buckets.set(key, []);
     buckets.get(key).push(o);

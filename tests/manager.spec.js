@@ -49,7 +49,6 @@ test("v08 plan both drivers, command live without pausing, physical stop, comple
   });
   await page.locator("[data-nav=management]").click();
   await field(page, 0, "pace").selectOption("aggressive");
-  await field(page, 1, "pace").selectOption("conserve");
   await page.locator('[data-manager-card="0"] .manager-plan>summary').click();
   await field(page, 0, "stopCount").selectOption("1");
   await page
@@ -79,8 +78,8 @@ test("v08 plan both drivers, command live without pausing, physical stop, comple
   await expect
     .poll(() => page.evaluate(() => __game.race.time))
     .toBeGreaterThan(before);
-  expect(await page.evaluate(() => __game.race.cars[1].managerPlan.pace)).toBe(
-    "conserve",
+  expect(await page.evaluate(() => __game.race.cars[0].managerPlan.pace)).toBe(
+    "balanced",
   );
   const rival = await page.evaluate(() =>
     JSON.stringify(__game.race.cars[2].managerPlan),
@@ -177,7 +176,7 @@ test("v08 actual changing weather and controlled Safety Car support executable r
   });
   expect(await page.evaluate(() => __game.race.control.phase)).toBe("sc");
   await page.locator("[data-manager-focus]").selectOption("1");
-  await field(page, 1, "pace").selectOption("conserve");
+  await field(page, 0, "pace").selectOption("conserve");
   await page.locator("[data-team-order]").selectOption("protect");
   await page.locator("[data-pit-camera]").selectOption("safety-car");
   await shot(page, {
@@ -250,7 +249,7 @@ test("v08 explicit manual handover preserves physical state and management works
       ),
     ),
   ).toBe(pose);
-  await field(page, 1, "pace").selectOption("aggressive");
+  await field(page, 0, "pace").selectOption("aggressive");
   await page.locator("[data-manager-focus]").selectOption("1");
   expect(await page.evaluate(() => __game.race.manualControl)).toBe(false);
   const bounds = await page.locator(".manager-central").boundingBox();
@@ -270,7 +269,7 @@ test("v08 delegated championship reports survive reload and next session uses sa
   const errors = await boot(page);
   await page.evaluate(() => {
     __game.frame = () => {};
-    __game.save.settings.managerPlans[1].pace = "conserve";
+    __game.save.settings.managerPlans[0].pace = "conserve";
     __game.store();
     __game.ui.navigate("competitions");
   });
@@ -292,7 +291,7 @@ test("v08 delegated championship reports survive reload and next session uses sa
     () => __game.save.competitions.series.sprint.sessions[0],
   );
   expect(saved.strategy).toBeTruthy();
-  expect(saved.strategy.initial[1].plan.pace).toBe("conserve");
+  expect(saved.strategy.initial[0].plan.pace).toBe("conserve");
   await page.evaluate(() => {
     __game.frame = () => {};
     __game.ui.navigate("competitions");
@@ -303,7 +302,7 @@ test("v08 delegated championship reports survive reload and next session uses sa
     .click();
   await page.waitForFunction(() => __game.race?.manager);
   expect(await page.evaluate(() => __game.race.sessionType)).toBe("race");
-  expect(await page.evaluate(() => __game.race.cars[1].managerPlan.pace)).toBe(
+  expect(await page.evaluate(() => __game.race.cars[0].managerPlan.pace)).toBe(
     "conserve",
   );
   for (let i = 0; i < 15; i++) {

@@ -414,7 +414,7 @@ export function validateCompetitionData(raw = {}, career = {}) {
     const seen = new Set(),
       slots = new Set();
     for (const s of (Array.isArray(value.sessions) ? value.sessions : []).slice(
-      -24,
+      -36,
     )) {
       if (
         !s ||

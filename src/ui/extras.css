@@ -452,7 +452,40 @@ input[type="password"] {
 }
 .paint-editor input {
   width: 100%;
-  height: 44px;
+  height: 40px;
+  box-sizing: border-box;
+  background: #0d1522;
+  color: #f8fafc;
+  border: 1px solid #35465d;
+  border-radius: 5px;
+  padding: 6px 10px;
+  font-size: 13px;
+}
+.paint-editor select {
+  width: 100%;
+  height: 40px;
+  box-sizing: border-box;
+  background: #0d1522;
+  color: #f8fafc;
+  border: 1px solid #35465d;
+  border-radius: 5px;
+  padding: 6px 10px;
+  font-size: 13px;
+}
+.modal[aria-label="academy-creator"] {
+  max-width: 780px;
+  width: 92vw;
+}
+.paint-editor.academy-form {
+  margin: 0;
+  gap: 10px 14px;
+}
+.paint-editor.academy-form label {
+  gap: 5px;
+}
+.paint-editor.academy-form input,
+.paint-editor.academy-form select {
+  height: 36px;
 }
 .paint-editor input[type="color"] {
   padding: 4px;

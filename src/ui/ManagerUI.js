@@ -10,6 +10,7 @@ import {
   driverCatalog,
   pilotStats,
   pilotPersonality,
+  activeDriverForSave,
 } from "../data/drivers.js";
 import { performance as carStats } from "../garage.js";
 import { activeTrack } from "../track.js";
@@ -57,7 +58,7 @@ function card(g, slot, c, live) {
       ? g.race
       : { laps: g.save.settings.laps, difficulty: g.save.settings.difficulty },
     e = estimateStrategy(c, p, r);
-  return `<article class="manager-driver" data-manager-card="${id}"><header><span class="manager-number">0${slot + 1}</span><div><small>${live ? "COMANDO DE EQUIPE" : "PLANEJAMENTO INDIVIDUAL"}</small><h3>${esc(driverCatalog[c.driverId].name)}</h3></div>${live ? `<button data-action="manager-focus" data-id="${id}">ACOMPANHAR</button>` : ""}</header><output data-manager-status="${id}">${live ? "Aguardando telemetria…" : "Plano salvo para a próxima sessão"}</output><div class="manager-fields">
+  return `<article class="manager-driver" data-manager-card="${id}"><header><span class="manager-number">0${slot + 1}</span><div><small>${live ? "COMANDO DE EQUIPE" : "PLANEJAMENTO INDIVIDUAL"}</small><h3>${esc(c.academyDriver?.name || (slot === 0 ? activeDriverForSave(g.save).name : driverCatalog[c.driverId].name))}</h3></div>${live ? `<button data-action="manager-focus" data-id="${id}">ACOMPANHAR</button>` : ""}</header><output data-manager-status="${id}">${live ? "Aguardando telemetria…" : "Plano salvo para a próxima sessão"}</output><div class="manager-fields">
  ${select(id, "pace", "Ritmo", Object.entries(paceNames), p.pace)}
  ${select(
    id,
@@ -180,10 +181,10 @@ export function managerPanel(g, live = false) {
           )
           .join(
             "",
-          )}</select></label><p class="manager-note">Piloto titular ativo: carro #${g.race.cars[0]?.number ?? 7} (${esc(driverCatalog[g.race.cars[0]?.driverId ?? 0].name)}). Respeita bandeiras, tráfego e limites físicos.</p>`
+          )}</select></label><p class="manager-note">Piloto titular ativo: carro #${g.race.cars[0]?.number ?? 7} (${esc(g.race.cars[0]?.academyDriver?.name || driverCatalog[g.race.cars[0]?.driverId ?? 0].name)}). Respeita bandeiras, tráfego e limites físicos.</p>`
       : ""
   }
- <div class="manager-snapshots">${live ? own.map((c) => `<p data-manager-overview="${c.id}">C${c.id + 1} · ${esc(driverCatalog[c.driverId].name)}</p>`).join("") : ""}</div><div class="manager-cards">${live ? own.map((c, i) => card(g, i, c, true)).join("") : [0].map((i) => card(g, i, null, false)).join("")}</div>${live ? "<details><summary>DECISÕES E RIVAIS</summary><div data-manager-journal></div></details>" : '<p class="manager-note">O composto de largada e a configuração são fixados ao iniciar. Planos de até seis paradas; cada janela é limitada à duração real da sessão.</p>'}</div></details>`;
+ <div class="manager-snapshots">${live ? own.map((c) => `<p data-manager-overview="${c.id}">C${c.id + 1} · ${esc(c.academyDriver?.name || driverCatalog[c.driverId].name)}</p>`).join("") : ""}</div><div class="manager-cards">${live ? own.map((c, i) => card(g, i, c, true)).join("") : [0].map((i) => card(g, i, null, false)).join("")}</div>${live ? "<details><summary>DECISÕES E RIVAIS</summary><div data-manager-journal></div></details>" : '<p class="manager-note">O composto de largada e a configuração são fixados ao iniciar. Planos de até seis paradas; cada janela é limitada à duração real da sessão.</p>'}</div></details>`;
 }
 export function managerHistory(g) {
   const reports = g.save.managerHistory || [];

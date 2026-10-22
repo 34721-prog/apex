@@ -1,6 +1,7 @@
 import {
   pilotPersonality,
   pilotStats,
+  activeAcademyDriver,
 } from "../data/drivers.js";
 
 // Single-driver team model: each team on the 6-car grid fields 1 active driver.
@@ -8,10 +9,22 @@ export function assignTeam(race, save) {
   if (!race?.cars?.length) return;
   const lead = race.cars[0];
   const dev = (save?.team?.development || 0) * 0.015;
+  const promoted = activeAcademyDriver(save);
   if (lead) {
     lead.driverId = save?.selectedDriver ?? lead.driverId ?? 0;
-    lead.personality = pilotPersonality(lead.driverId);
-    lead.stats = pilotStats(lead.stats, lead.driverId, race.mode, race.realism);
+    if (promoted) {
+      lead.name = promoted.name;
+      lead.number = promoted.number;
+      lead.academyDriver = promoted;
+    }
+    lead.personality = pilotPersonality(lead.driverId, promoted);
+    lead.stats = pilotStats(
+      lead.stats,
+      lead.driverId,
+      race.mode,
+      race.realism,
+      promoted,
+    );
     lead.stats.handling *= 1 + dev * 0.5;
     lead.stats.braking *= 1 + dev * 0.4;
     lead.teammate = false;

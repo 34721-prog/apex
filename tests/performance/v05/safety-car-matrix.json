@@ -38,7 +38,7 @@
     ],
     "maxMove": 0.36728581035059765,
     "collisions": 0,
-    "time": 257.0166666667616,
+    "time": 256.9833333334283,
     "decisions": 0
   },
   {
@@ -66,7 +66,7 @@
     ],
     "maxMove": 0.3671122100478134,
     "collisions": 0,
-    "time": 336.9500000000222,
+    "time": 336.96666666668887,
     "decisions": 0
   },
   {
@@ -108,7 +108,7 @@
     ],
     "maxMove": 0.36713787708700857,
     "collisions": 0,
-    "time": 369.5999999999925,
+    "time": 369.58333333332587,
     "decisions": 0
   },
   {
@@ -122,7 +122,7 @@
     ],
     "maxMove": 0.3672175968604901,
     "collisions": 0,
-    "time": 373.3833333333224,
+    "time": 373.36666666665576,
     "decisions": 0
   },
   {
@@ -178,7 +178,49 @@
     ],
     "maxMove": 0.3673027737601719,
     "collisions": 0,
-    "time": 398.83333333329927,
+    "time": 398.8166666666326,
+    "decisions": 0
+  },
+  {
+    "track": "imperiale",
+    "states": [
+      "parked",
+      "deploy",
+      "train",
+      "inlap",
+      "return"
+    ],
+    "maxMove": 0.36673481578608,
+    "collisions": 0,
+    "time": 399.3999999999654,
+    "decisions": 0
+  },
+  {
+    "track": "sakura",
+    "states": [
+      "parked",
+      "deploy",
+      "train",
+      "inlap",
+      "return"
+    ],
+    "maxMove": 0.36716637299253646,
+    "collisions": 0,
+    "time": 386.11666666664416,
+    "decisions": 0
+  },
+  {
+    "track": "lumina",
+    "states": [
+      "parked",
+      "deploy",
+      "train",
+      "inlap",
+      "return"
+    ],
+    "maxMove": 0.3673728451674343,
+    "collisions": 0,
+    "time": 345.01666666668154,
     "decisions": 0
   },
   {

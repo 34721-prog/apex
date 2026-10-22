@@ -155,10 +155,12 @@ export class Race {
     this.done = false;
     this.replayFrames = [];
     this._nextReplaySample = 0;
-    this._standingsCacheKey = null;
-    this._standingsCache = null;
-    this._physicalOrderCacheKey = null;
-    this._physicalOrderCache = null;
+    Object.defineProperties(this, {
+      _standingsCacheKey: { value: null, writable: true, enumerable: false },
+      _standingsCache: { value: null, writable: true, enumerable: false },
+      _physicalOrderCacheKey: { value: null, writable: true, enumerable: false },
+      _physicalOrderCache: { value: null, writable: true, enumerable: false },
+    });
 
     this.cars = drivers
       .slice(0, ["time-trial", "practice"].includes(mode) ? 1 : botCount + 1)

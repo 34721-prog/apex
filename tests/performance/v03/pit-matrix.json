@@ -2,37 +2,37 @@
   {
     "track": "aurora",
     "mode": "own",
-    "time": 76.99999999999692,
+    "time": 77.03333333333025,
     "services": 6,
     "overlaps": 0,
-    "maxMotion": 1.1500000000000248,
+    "maxMotion": 1.1500000000000214,
     "maxAlignment": 0.05075000665350759
   },
   {
     "track": "aurora",
     "mode": "same",
-    "time": 138.2166666666688,
+    "time": 138.20000000000212,
     "services": 6,
     "overlaps": 0,
-    "maxMotion": 1.1500000000000261,
+    "maxMotion": 1.1500000000000252,
     "maxAlignment": 0.07457015425858858
   },
   {
     "track": "aurora",
     "mode": "rain",
-    "time": 76.94999999999692,
+    "time": 76.96666666666358,
     "services": 6,
     "overlaps": 0,
-    "maxMotion": 1.1500000000000128,
+    "maxMotion": 1.1500000000000181,
     "maxAlignment": 0.055160493075292694
   },
   {
     "track": "veloce",
     "mode": "own",
-    "time": 78.16666666666352,
+    "time": 78.14999999999685,
     "services": 6,
     "overlaps": 0,
-    "maxMotion": 1.1500000000000492,
+    "maxMotion": 1.1500000000000516,
     "maxAlignment": 0.029910266949031206
   },
   {
@@ -41,7 +41,7 @@
     "time": 139.76666666667003,
     "services": 6,
     "overlaps": 0,
-    "maxMotion": 1.150000000000056,
+    "maxMotion": 1.1500000000000545,
     "maxAlignment": 0.029910266949031206
   },
   {
@@ -50,7 +50,7 @@
     "time": 78.01666666666353,
     "services": 6,
     "overlaps": 0,
-    "maxMotion": 1.1500000000000346,
+    "maxMotion": 1.1500000000000397,
     "maxAlignment": 0.032617288766386476
   },
   {
@@ -59,16 +59,16 @@
     "time": 76.79999999999693,
     "services": 6,
     "overlaps": 0,
-    "maxMotion": 1.1500000000000077,
+    "maxMotion": 1.1500000000000075,
     "maxAlignment": 0.04388090573058467
   },
   {
     "track": "serpente",
     "mode": "same",
-    "time": 138.60000000000244,
+    "time": 138.58333333333576,
     "services": 6,
     "overlaps": 0,
-    "maxMotion": 1.1500000000000126,
+    "maxMotion": 1.1500000000000135,
     "maxAlignment": 0.04388090573058467
   },
   {
@@ -77,7 +77,7 @@
     "time": 76.73333333333026,
     "services": 6,
     "overlaps": 0,
-    "maxMotion": 1.1500000000000044,
+    "maxMotion": 1.150000000000007,
     "maxAlignment": 0.047808613319198834
   },
   {
@@ -86,16 +86,16 @@
     "time": 77.51666666666355,
     "services": 6,
     "overlaps": 0,
-    "maxMotion": 1.150000000000007,
+    "maxMotion": 1.1500000000000068,
     "maxAlignment": 0.02988983658304223
   },
   {
     "track": "neon",
     "mode": "same",
-    "time": 140.35000000000383,
+    "time": 140.3666666666705,
     "services": 6,
     "overlaps": 0,
-    "maxMotion": 1.1500000000000277,
+    "maxMotion": 1.150000000000024,
     "maxAlignment": 0.02988983658304223
   },
   {
@@ -104,25 +104,25 @@
     "time": 77.41666666666356,
     "services": 6,
     "overlaps": 0,
-    "maxMotion": 1.1500000000000048,
+    "maxMotion": 1.150000000000008,
     "maxAlignment": 0.03265583738876709
   },
   {
     "track": "titan",
     "mode": "own",
-    "time": 78.24999999999685,
+    "time": 78.26666666666351,
     "services": 6,
     "overlaps": 0,
-    "maxMotion": 1.1500000000000294,
+    "maxMotion": 1.150000000000036,
     "maxAlignment": 0.028601805889222568
   },
   {
     "track": "titan",
     "mode": "same",
-    "time": 144.0333333333401,
+    "time": 143.90000000000666,
     "services": 6,
     "overlaps": 0,
-    "maxMotion": 1.1500000000000565,
+    "maxMotion": 1.1500000000000554,
     "maxAlignment": 0.028601805889222568
   },
   {
@@ -131,7 +131,7 @@
     "time": 78.08333333333019,
     "services": 6,
     "overlaps": 0,
-    "maxMotion": 1.1500000000000137,
+    "maxMotion": 1.1500000000000075,
     "maxAlignment": 0.03128819343884116
   },
   {
@@ -149,16 +149,16 @@
     "time": 145.3666666666745,
     "services": 6,
     "overlaps": 0,
-    "maxMotion": 1.1500000000000599,
+    "maxMotion": 1.1500000000000568,
     "maxAlignment": 0.02946215179500822
   },
   {
     "track": "vento",
     "mode": "rain",
-    "time": 78.14999999999685,
+    "time": 78.11666666666352,
     "services": 6,
     "overlaps": 0,
-    "maxMotion": 1.1500000000000423,
+    "maxMotion": 1.150000000000043,
     "maxAlignment": 0.0322287132156418
   }
 ]

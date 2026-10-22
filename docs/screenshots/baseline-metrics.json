@@ -1,0 +1,26 @@
+{
+  "memory": {
+    "geometries": 137,
+    "textures": 24
+  },
+  "render": {
+    "frame": 96,
+    "calls": 156,
+    "triangles": 137208,
+    "points": 0,
+    "lines": 0
+  },
+  "programs": 25,
+  "avgFrameMs": 2.07,
+  "estFps": 483.5,
+  "sceneChildren": 60,
+  "meshCount": 136,
+  "instancedCount": 70,
+  "envStats": {
+    "identity": "Bosques e campus",
+    "vegetation": 639,
+    "facilities": 26,
+    "spatialBatches": 67,
+    "lodCells": 25
+  }
+}
